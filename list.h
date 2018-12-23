@@ -9,4 +9,5 @@ typedef struct List{
 } List;
 
 List *listNodeAlloc();
+List *initializeList();
 List *listAddElement(List *head, char *word);
