@@ -8,6 +8,6 @@ typedef struct Stack{
     struct Stack *next;
 } Stack;
 
-Stack *listNodeAlloc();
-Stack *initializeList();
-Stack *listAddElement(Stack *head, char *word);
+Stack *stackNodeAlloc();
+Stack *initializeStack();
+Stack *stackAddElement(Stack *head, char *word);
