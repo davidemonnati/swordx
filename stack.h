@@ -10,5 +10,6 @@ typedef struct Stack{
 
 Stack *stackNodeAlloc();
 Stack *initializeNode();
-Stack *push(Stack *head, char *word);
+Stack *push(Stack *stack, char *word);
 void printStack(Stack *head);
+void pop(Stack *head);
