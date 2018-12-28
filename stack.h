@@ -8,8 +8,10 @@ typedef struct Stack{
     struct Stack *next;
 } Stack;
 
-Stack *stackNodeAlloc();
-Stack *initializeNode();
+Stack *initializeNode(int wordLength);
 Stack *push(Stack *stack, char *word);
-void printStack(Stack *head);
 void pop(Stack *head);
+void printStack(Stack *head);
+char *getStackValue(Stack *head);
+Stack *getNextStackElement(Stack *head);
+int searchStackElement(Stack *head, char *value);
