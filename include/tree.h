@@ -9,3 +9,7 @@ typedef struct Tree {
     struct Tree *right;
 } Tree;
 
+Tree *nodeAlloc();
+Tree *insertNode(Tree* albero, char *word);
+Tree *getWords(Tree* albero, char *path);
+void printTree(Tree* albero);
