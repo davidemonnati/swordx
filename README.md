@@ -36,4 +36,4 @@ See also the list of [contributors](https://github.com/Erthor96/swordx/contribut
 
 ## License
 
-This project is licensed under the GNU General Public License V.3 - see the [LICENSE](LICENSE) file for details
+This project is licensed under the GNU General Public License v.3.0 - see the [LICENSE](LICENSE) file for details
