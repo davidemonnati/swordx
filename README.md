@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### MAN
 E' possibile passare a swordx i seguenti parametri aggiuntivi:
 
-–help e -h: stampa a video l'help del programma;
+–help e -h: stampa a video l'help del programma;<br />
 –recursive e -r: se viene passato questo argomento, nella collezione delle informazioni di una directory vengono seguite tutte le sottodirectory;
 –follow e -f: nell'elaborazione di una directory vengono seguiti i link;
 –explude <file> e -e <file>: <file> non viene considerato nell'elaborazione (questo parametro ha senso solo se si sta elaborando una directory);
