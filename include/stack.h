@@ -3,10 +3,7 @@
 //
 
 
-typedef struct Stack{
-    char *value;
-    struct Stack *next;
-} Stack;
+typedef struct Stack Stack;
 
 Stack *initializeNode(int wordLength);
 Stack *push(Stack *stack, char *word);
