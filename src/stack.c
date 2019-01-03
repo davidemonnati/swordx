@@ -3,6 +3,12 @@
 #include <malloc.h>
 #include "../include/stack.h"
 
+typedef struct Stack{
+    char *value;
+    struct Stack *next;
+} Stack;
+
+
 Stack *initializeNode(int wordLength){
     Stack* head = (Stack *) malloc(sizeof(Stack));
     head->value = NULL; // = (char *) malloc((wordLength+1)*sizeof(char));
