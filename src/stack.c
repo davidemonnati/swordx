@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
+#include <stdlib.h>
 #include "../include/stack.h"
 
 typedef struct Stack{
@@ -25,18 +26,22 @@ Stack *push(Stack *stack, char *word) {
 }
 
 void pop(Stack *head){
+    if(head->value == NULL){
+        perror("SWORDX: Impossibile effettuare il pop, lo stack è vuoto");
+        exit(EXIT_FAILURE);
+    }
+
     Stack *tmp = (Stack *) malloc(sizeof(Stack*));
-    printf("%s", head->value);
+    printf("%s\n", head->value);
     *tmp = *head->next;
     *head = *tmp;
     free(tmp);
 }
 
 void printStack(Stack *head) {
-    if (head != NULL) {
-        printf("%s\n", head->value);
-        printStack(head->next);
-    }
+    if(head->value ==  NULL) return;
+    printf("%s\n", head->value);
+    return printStack(head->next);
 }
 
 char *getStackValue(Stack *head){
