@@ -5,7 +5,7 @@
 
 typedef struct Stack Stack;
 
-Stack *initializeNode(int wordLength);
+Stack *initializeNode();
 Stack *push(Stack *stack, char *word);
 void pop(Stack *head);
 void printStack(Stack *head);
