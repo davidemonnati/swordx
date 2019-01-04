@@ -9,7 +9,7 @@ typedef struct Stack{
 } Stack;
 
 
-Stack *initializeNode(int wordLength){
+Stack *initializeNode(){
     Stack* head = (Stack *) malloc(sizeof(Stack));
     head->value = NULL; // = (char *) malloc((wordLength+1)*sizeof(char));
     head->next = NULL;
