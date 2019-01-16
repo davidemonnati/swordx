@@ -30,7 +30,7 @@ time è il tempo necessario all'elaborazione del file.
 
 ## Authors
 
-* **Davide Monnati** - *Initial work* - [Erthor96](https://github.com/Erthor96)
+* **Davide Monnati** - *Initial work* - [davidemonnati](https://github.com/davidemonnati)
 
 See also the list of [contributors](https://github.com/Erthor96/swordx/contributors) who participated in this project.
 
