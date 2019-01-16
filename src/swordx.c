@@ -5,8 +5,6 @@
 #include <string.h>
 #include <getopt.h>
 
-#include "../include/test.h"
-
 static struct option const long_opts[];
 int main(int argc, char **argv);
 void printHelp();
@@ -31,39 +29,52 @@ static struct option const long_opts[] =
 int main(int argc, char **argv) {
     int c;
     Stack *listFiles = initializeNode();
-    unsigned char flags = 0;  // HEX
-
 
 //     Dentro ad ogni funzione attivo i flag
     while ((c = getopt_long(argc, argv, "hrfeamisolu", long_opts, NULL)) != -1) {
         switch (c) {
             case 'h':
-                printHelp();
+                // do something
+                break;
+                
+            case 'r':
+                // do something
+                break;
+
+            case 'f':
+                // do something
+                break;
+                
+            case 'e':
+                // do something
+                break;
+
+            case  'a':
+                // do something
+                break;
+            
+            case 'm':
+                // do something
+                break;
+
+            case 'i':
+                // do something
+                break;
+
+            case 's':
+                // do something
                 break;
 
             case 'o':
-                optind--;
-                for (; optind < argc && *argv[optind] != '-'; optind++) {
-                    printf("o: %s \n", argv[optind]);
-                }
-//                printf("o: %s \n", optarg);
+		// do something
+            	break;
 
+            case 'l':
+                // do something
                 break;
 
-            case 'e':
-                test_stack();
-                break;
-
-            case 'm':
-                test_albero();
-                break;
-
-            case 'r':
-                test_flags();
-                break;
-
-            default:
-                fprintf(stderr, "prova"); // da sistemare il messaggio d'errore
+            case 'u':
+                // do something
                 break;
         }
     }
