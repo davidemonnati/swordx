@@ -1,6 +1,11 @@
-//
-// Created by davide on 10/12/18.
-//
+#ifndef TREE_MODULE_TREE_H
+#define TREE_MODULE_TREE_H
+
+#include <string.h>
+#include <stdio.h>
+#include <malloc.h>
+#include <ctype.h>
+#include "./managefile.h"
 
 typedef struct Tree Tree;
 
@@ -9,3 +14,8 @@ Tree *insertNode(Tree* albero, char *word);
 Tree *getWords(Tree* albero, char *path);
 char *toLowerCase(char *word);
 void printTree(Tree* albero);
+void printfTree(Tree* albero);
+int max_occurrency(Tree* albero, int *occ);
+void sbo(Tree* albero);
+
+#endif //TREE_MODULE_TREE_H

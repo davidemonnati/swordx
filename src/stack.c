@@ -1,7 +1,4 @@
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
-#include <stdlib.h>
+
 #include "../include/stack.h"
 
 typedef struct Stack{
@@ -52,14 +49,13 @@ Stack *getNextStackElement(Stack *head){
     return head->next;
 }
 
-int searchStackElement(Stack *head, char *value){
+int searchStackElement(Stack *head, char *value) {
     int i = 0;
-    while(head != NULL){
-        if(strcmp(head->value, value)==0){
+    while (head != NULL) {
+        if (strcmp(head->value, value) == 0) {
             i++;
             return i;
-        }
-        else{
+        } else {
             head = head->next;
         }
     }
