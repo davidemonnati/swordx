@@ -2,9 +2,6 @@
 // Created by davide on 29/12/18.
 //
 
-#include <stdio.h>
-#include <memory.h>
-#include <malloc.h>
 #include "../include/managefile.h"
 
 FILE *openFileReadMode(char *path){
