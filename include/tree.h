@@ -15,5 +15,7 @@ Tree *getWords(Tree* albero, char *path);
 char *toLowerCase(char *word);
 void printTree(Tree* albero);
 void printfTree(Tree* albero);
+int max_occurrency(Tree* albero, int *occ);
+void sbo(Tree* albero);
 
 #endif //TREE_MODULE_TREE_H
