@@ -5,7 +5,8 @@
 #include <string.h>
 #include <getopt.h>
 
-static struct option const long_opts[];
+#include "../include/optmanager.h"
+
 int main(int argc, char **argv);
 void printHelp();
 
@@ -28,7 +29,6 @@ static struct option const long_opts[] =
 
 int main(int argc, char **argv) {
     int c;
-    Stack *listFiles = initializeNode();
 
 //     Dentro ad ogni funzione attivo i flag
     while ((c = getopt_long(argc, argv, "hrfeamisolu", long_opts, NULL)) != -1) {
