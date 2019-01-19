@@ -9,17 +9,20 @@ typedef struct Stack{
 
 Stack *initializeNode(){
     Stack* head = (Stack *) malloc(sizeof(Stack));
-    head->value = NULL; // = (char *) malloc((wordLength+1)*sizeof(char));
+    head->value = NULL;
     head->next = NULL;
     return head;
 }
 
-Stack *push(Stack *stack, char *word) {
-    Stack *newStack = initializeNode(strlen(word));
+void *push(Stack *stack, char *word) {
+    Stack *newStack = initializeNode();
     newStack->value = (char *) malloc((strlen(word)+1) * sizeof(char));
     strcpy(newStack->value, word);
-    newStack->next = stack;
-    return newStack;
+    newStack->next = initializeNode();
+    *newStack->next = *stack;
+    *stack = *newStack;
+    free(newStack);
+    return stack;
 }
 
 void pop(Stack *head){
@@ -28,7 +31,7 @@ void pop(Stack *head){
         exit(EXIT_FAILURE);
     }
 
-    Stack *tmp = (Stack *) malloc(sizeof(Stack*));
+    Stack *tmp = initializeNode();
     printf("%s\n", head->value);
     *tmp = *head->next;
     *head = *tmp;
