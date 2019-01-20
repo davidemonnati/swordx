@@ -35,14 +35,11 @@ Tree *getWords(Tree* albero, char *path) {
     size_t linesize = 0;
 
     // Stampo il contenuto del file
-    if (rFile == NULL) fprintf(stderr, "SWORDX: Errore durante l'apertura del file");
-    else {
-        while (getline(&buffer, &linesize, rFile) > 0) {
-            word = strtok(buffer, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
-            while (word != NULL) {
-                albero = insertNode(albero, toLowerCase(word));
-                word = strtok(NULL, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
-            }
+    while (getline(&buffer, &linesize, rFile) > 0) {
+        word = strtok(buffer, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
+        while (word != NULL) {
+            albero = insertNode(albero, toLowerCase(word));
+            word = strtok(NULL, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
         }
     }
     fclose(rFile);
@@ -72,4 +69,3 @@ void printfTree(Tree* albero) {
         printTree(albero->right);
     }
 }
-
