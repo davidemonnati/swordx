@@ -6,7 +6,10 @@
 
 FILE *openFileReadMode(char *path){
     FILE *rf = fopen(path, "r");
-    if(rf == NULL) fprintf(stderr, "SWORDX: Error opening file. \n");
+    if(!rf){
+        fprintf(stderr, "swordx: %s, %s\n", path, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
     return rf;
 }
 
