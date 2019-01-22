@@ -80,6 +80,19 @@ int main(int argc, char **argv) {
         }
     }
 
+    if(!argv[1]){
+        fprintf(stderr, "swordx: no input files or directory\n");
+        usage();
+        exit(EXIT_FAILURE);
+    }
+
+    Tree *albero = nodeAlloc();
+    char *path = argv[1];
+
+    albero = getWords(albero, path);
+    printTree(albero);
+
+    free(albero);
     return 0;
 }
 
