@@ -17,7 +17,7 @@ swordx: $(OBJDIR)/swordx.o $(OBJDIR)/stack.o $(OBJDIR)/test.o $(OBJDIR)/tree.o $
 $(OBJDIR)/%.o: %.c %.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-$(OBJDIR)/swordx.o: swordx.c stack.c test.c tree.c managefile.c optmanager.c stack.h test.h tree.h managefile.h optmanager.h
+$(OBJDIR)/swordx.o: swordx.c stack.c tree.c managefile.c optmanager.c stack.h tree.h managefile.h optmanager.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 .PONY: install uninstall clean
