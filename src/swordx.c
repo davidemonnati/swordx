@@ -8,6 +8,7 @@
 #include "../include/optmanager.h"
 
 int main(int argc, char **argv);
+void usage();
 void printHelp();
 
 static struct option const long_opts[] =
@@ -80,6 +81,10 @@ int main(int argc, char **argv) {
     }
 
     return 0;
+}
+
+void usage(){
+    printf("Usage: swordx [options] [inputs]\n");
 }
 
 void printHelp() {
