@@ -11,7 +11,7 @@ CFLAGS  = -g -Wall -I$(HEADERDIR)
 
 all: swordx
 
-swordx: $(OBJDIR)/swordx.o $(OBJDIR)/stack.o $(OBJDIR)/test.o $(OBJDIR)/tree.o $(OBJDIR)/managefile.o $(OBJDIR)/optmanager.o
+swordx: $(OBJDIR)/swordx.o $(OBJDIR)/stack.o $(OBJDIR)/tree.o $(OBJDIR)/managefile.o $(OBJDIR)/optmanager.o
 	$(CC) $^ $(CFLAGS) -o $@
 
 $(OBJDIR)/%.o: %.c %.h
