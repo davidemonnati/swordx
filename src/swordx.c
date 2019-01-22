@@ -8,6 +8,7 @@
 #include "../include/optmanager.h"
 
 int main(int argc, char **argv);
+void usage();
 void printHelp();
 
 static struct option const long_opts[] =
@@ -79,7 +80,24 @@ int main(int argc, char **argv) {
         }
     }
 
+    if(!argv[1]){
+        fprintf(stderr, "swordx: no input files or directory\n");
+        usage();
+        exit(EXIT_FAILURE);
+    }
+
+    Tree *albero = nodeAlloc();
+    char *path = argv[1];
+
+    albero = getWords(albero, path);
+    printTree(albero);
+
+    free(albero);
     return 0;
+}
+
+void usage(){
+    printf("Usage: swordx [options] [inputs]\n");
 }
 
 void printHelp() {
