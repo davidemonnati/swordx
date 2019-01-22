@@ -36,8 +36,8 @@ int main(int argc, char **argv) {
     while ((c = getopt_long(argc, argv, "hrfeamisolu", long_opts, NULL)) != -1) {
         switch (c) {
             case 'h':
-                // do something
-                break;
+                printHelp();
+                exit(EXIT_SUCCESS);
                 
             case 'r':
                 // do something
