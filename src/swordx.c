@@ -6,6 +6,7 @@
 #include <getopt.h>
 
 #include "../include/optmanager.h"
+#include "../include/tree.h"
 
 int main(int argc, char **argv);
 void usage();
