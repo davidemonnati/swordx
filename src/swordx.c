@@ -6,6 +6,7 @@
 #include <getopt.h>
 
 #include "../include/optmanager.h"
+#include "../include/tree.h"
 
 int main(int argc, char **argv);
 void usage();
@@ -35,8 +36,8 @@ int main(int argc, char **argv) {
     while ((c = getopt_long(argc, argv, "hrfeamisolu", long_opts, NULL)) != -1) {
         switch (c) {
             case 'h':
-                // do something
-                break;
+                printHelp();
+                exit(EXIT_SUCCESS);
                 
             case 'r':
                 // do something
