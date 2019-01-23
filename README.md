@@ -1,4 +1,5 @@
 
+
 # swordx
 
  
@@ -7,6 +8,10 @@
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Man
+Usage:
+
+     ./swordx [options] [inputs]
+
 E' possibile passare a swordx i seguenti parametri:
 
  - help e -h: stampa a video l'help del programma;
@@ -23,7 +28,6 @@ E' possibile passare a swordx i seguenti parametri:
 	 - **iw** è il numero delle parole ignorate;
 	 - **time** è il tempo necessario all'elaborazione del file. 
 - update <**file**> se presente il file swordx.out (o il file indicato con l'opzione -o) scrive nel file <**file**>, con lo stesso formato del file di output, l'elenco delle parole con le rispettive variazioni rispetto all'esecuzione precedente del programma.
-
 
 time è il tempo necessario all'elaborazione del file.
 –update <file> se presente il file swordx.out (o il file indicato con l'opzione -o) scrive nel file <file>, con lo stesso formato del file di output, l'elenco delle parole con le rispettive variazioni rispetto all'esecuzione precedente del programma.
