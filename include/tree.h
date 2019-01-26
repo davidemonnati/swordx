@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <ctype.h>
-#include "./managefile.h"
+#include "managefile.h"
 
 typedef struct Tree Tree;
 
