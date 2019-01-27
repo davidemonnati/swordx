@@ -1,13 +1,11 @@
-
-#ifndef SWORDX_MODULE_UTILS_H
-#define SWORDX_MODULE_UTILS_H
-
-// #include <stdio.h>
-// #include <getopt.h>
-// #include <memory.h>
-// #include <malloc.h>
-// #include <errno.h>
-// #include <dirent.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <getopt.h>
+#include <memory.h>
+#include <malloc.h>
+#include <errno.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 #include "tree.h"
 #include "stack.h"
@@ -30,8 +28,7 @@ void writeFile(FILE *file, char *value);
 int flagStatus(unsigned char option, unsigned char flags);
 void printFlagsValue(unsigned char option);
 unsigned char enableFlag(unsigned char flags, unsigned char option);
-int typeFile(char *path);
-int typeDir(char *path);
+int isFile(char *path);
+int isDir(char *path);
 int cycleDir(char *path, Tree *albero);
 
-#endif //SWORDX_MODULE_UTILS_H
