@@ -1,5 +1,6 @@
 
-#include "../include/tree.h"
+#include "tree.h"
+#include "utils.h"
 
 typedef struct Tree {
     char value[100];
