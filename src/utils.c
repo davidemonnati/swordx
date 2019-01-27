@@ -43,7 +43,7 @@ unsigned char enableFlag(unsigned char flags, unsigned char option){
 
 /* Dir and file management functions */
 
-int typeFile(char *path){
+int isFile(char *path){
     struct stat statbuf;
     if(lstat(path, &statbuf)) return 0; // il file o cartella non esiste
     if(S_ISREG(statbuf.st_mode)) return 1;
@@ -51,7 +51,7 @@ int typeFile(char *path){
     return 0;
 }
 
-int typeDir(char *path){
+int isDir(char *path){
     struct stat statbuf;
     if(lstat(path, &statbuf)) return 0; // il file o cartella non esiste
     if(S_ISDIR(statbuf.st_mode)) return 1;
