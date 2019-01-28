@@ -53,4 +53,7 @@ dkms.conf
 .vscode
 prova
 .directory
+<<<<<<< HEAD
 swordx
+=======
+>>>>>>> stable
