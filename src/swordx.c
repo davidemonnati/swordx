@@ -5,8 +5,8 @@
 #include <string.h>
 #include <getopt.h>
 
-#include "../include/optmanager.h"
-#include "../include/tree.h"
+#include "tree.h"
+#include "utils.h"
 
 int main(int argc, char **argv);
 void usage();
@@ -31,6 +31,7 @@ static struct option const long_opts[] =
 
 int main(int argc, char **argv) {
     int c;
+    Tree *albero = nodeAlloc();
 
 //     Dentro ad ogni funzione attivo i flag
     while ((c = getopt_long(argc, argv, "hrfeamisolu", long_opts, NULL)) != -1) {
@@ -68,7 +69,7 @@ int main(int argc, char **argv) {
                 break;
 
             case 'o':
-		// do something
+		        // do something
             	break;
 
             case 'l':
@@ -81,21 +82,28 @@ int main(int argc, char **argv) {
         }
     }
 
-    if(!argv[1]){
+    if(argc < 2){
         fprintf(stderr, "swordx: no input files or directory\n");
         usage();
         exit(EXIT_FAILURE);
     }
+    
+    if(isFile(argv[1])){
+        Tree *albero = nodeAlloc();
+        char *path = argv[1];
 
-    Tree *albero = nodeAlloc();
-    char *path = argv[1];
-
-    albero = getWords(albero, path);
-    printTree(albero);
+        albero = getWords(albero, path);
+        printTree(albero);
+    } else if(isDir(argv[1])){
+        cycleDir(argv[1], albero);
+        printTree(albero);
+    }
 
     free(albero);
     return 0;
 }
+
+
 
 void usage(){
     printf("Usage: swordx [options] [inputs]\n");
