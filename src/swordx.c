@@ -88,22 +88,22 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
     
-    if(isFile(argv[1])){
-        Tree *albero = nodeAlloc();
-        char *path = argv[1];
+    while(argc > 1){
+        if(isFile(argv[argc-1])){
+            char *path = argv[argc-1];
 
-        albero = getWords(albero, path);
-        printTree(albero);
-    } else if(isDir(argv[1])){
-        cycleDir(argv[1], albero);
-        printTree(albero);
+            albero = getWords(albero, path);
+
+        } else if(isDir(argv[argc-1])){
+            cycleDir(argv[argc-1], albero);
+        }
+        argc--;
     }
 
+    printTree(albero);
     free(albero);
     return 0;
 }
-
-
 
 void usage(){
     printf("Usage: swordx [options] [inputs]\n");
