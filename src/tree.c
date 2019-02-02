@@ -53,20 +53,21 @@ char *toLowerCase(char *word) {
     return word;
 }
 
-void printTree(Tree* albero) {
+void printTree(Tree* albero, char *output) {
     if (albero != NULL) {
-        printTree(albero->left);
+        printTree(albero->left, output);
         char *word = (char *) malloc(sizeof(char));
         sprintf(word, "%s %i\n", albero->value, albero->occurrences);
-        writeFile(openFileWriteMode("swordx.out"), word);
-        printTree(albero->right);
+        (output == NULL) ? output = "swordx.out" : NULL; //strcpy(output, "swordx.out") : NULL ;
+        writeFile(openFileWriteMode(output), word);
+        printTree(albero->right, output);
     }
 }
 
 void printfTree(Tree* albero) {
     if (albero != NULL) {
-        printTree(albero->left);
+        printfTree(albero->left);
         printf("%s %i\n", albero->value, albero->occurrences);
-        printTree(albero->right);
+        printfTree(albero->right);
     }
 }

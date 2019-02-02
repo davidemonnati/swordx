@@ -13,7 +13,7 @@ Tree *nodeAlloc();
 Tree *insertNode(Tree* albero, char *word);
 Tree *getWords(Tree* albero, char *path);
 char *toLowerCase(char *word);
-void printTree(Tree* albero);
+void printTree(Tree* albero, char* output);
 void printfTree(Tree* albero);
 
 #endif //TREE_MODULE_TREE_H
