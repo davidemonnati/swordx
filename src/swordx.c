@@ -31,6 +31,7 @@ static struct option const long_opts[] =
 
 int main(int argc, char **argv) {
     int c;
+    char *output=NULL;
     Tree *albero = nodeAlloc();
 
 //     Dentro ad ogni funzione attivo i flag
@@ -69,6 +70,8 @@ int main(int argc, char **argv) {
                 break;
 
             case 'o':
+                output = (char*)malloc(sizeof(char));
+                output = optarg;
 		        // do something
             	break;
 
@@ -100,7 +103,7 @@ int main(int argc, char **argv) {
         argc--;
     }
 
-    printTree(albero);
+    printTree(albero, output);
     free(albero);
     return 0;
 }
