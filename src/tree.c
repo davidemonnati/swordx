@@ -65,8 +65,8 @@ void printTree(Tree* albero) {
 
 void printfTree(Tree* albero) {
     if (albero != NULL) {
-        printTree(albero->left);
+        printfTree(albero->left);
         printf("%s %i\n", albero->value, albero->occurrences);
-        printTree(albero->right);
+        printfTree(albero->right);
     }
 }
