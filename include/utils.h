@@ -10,18 +10,6 @@
 #include "tree.h"
 #include "stack.h"
 
-/* Defining flags */
-
-#define FLAG_RECURSIVE (1<<0)
-#define FLAG_FOLLOW (1<<1)
-#define FLAG_EXCLUDE (1<<2)
-#define FLAG_ALPHA (1<<3)
-#define FLAG_MIN (1<<4)
-#define FLAG_IGNORE (1<<5)
-#define FLAG_SBO (1<<6)
-#define FLAG_OUTPUT (1<<7)
-
-
 FILE *openFileReadMode(char *path);
 FILE *openFileWriteMode(char *path);
 void writeFile(FILE *file, char *value);
