@@ -13,7 +13,7 @@
 FILE *openFileReadMode(char *path);
 FILE *openFileWriteMode(char *path);
 void writeFile(FILE *file, char *value);
-int flagStatus(unsigned char option, unsigned char flags);
+int flagIsActive(unsigned char option, unsigned char flags);
 void printFlagsValue(unsigned char option);
 unsigned char enableFlag(unsigned char flags, unsigned char option);
 int isFile(char *path);
