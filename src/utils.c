@@ -25,7 +25,7 @@ void writeFile(FILE *file, char *value){
 
 /* Option and flag management functions */
 
-int flagStatus(unsigned char option, unsigned char flags){
+int flagIsActive(unsigned char option, unsigned char flags){
     if(flags & option) return 1;
     else return 0;
 
@@ -79,7 +79,7 @@ int cycleDir(char *path, Tree *albero){
         if(!strcmp(file_name, ".") ||!strcmp(file_name, "..")) continue; // non considera le cartelle .. e .
         sprintf(complete_path, "%s/%s", path, file_name);
 
-        getWords(albero, complete_path);
+        // getWords(albero, complete_path); // DA DECOMMENTARE
     }
     closedir(dir);
 
