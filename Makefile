@@ -11,13 +11,13 @@ CFLAGS  = -g -Wall -I$(HEADERDIR)
 
 all: swordx
 
-swordx: $(OBJDIR)/swordx.o $(OBJDIR)/stack.o $(OBJDIR)/tree.o $(OBJDIR)/utils.o
+swordx: $(OBJDIR)/swordx.o $(OBJDIR)/stack.o $(OBJDIR)/tree.o $(OBJDIR)/utils.o $(OBJDIR)/trie.o
 	$(CC) $^ $(CFLAGS) -o $@
 
 $(OBJDIR)/%.o: %.c %.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-$(OBJDIR)/swordx.o: swordx.c stack.c tree.c utils.c stack.h tree.h utils.h
+$(OBJDIR)/swordx.o: swordx.c stack.c tree.c utils.c trie.c stack.h tree.h utils.h trie.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 .PONY: install uninstall clean
