@@ -10,6 +10,7 @@ typedef struct Trie Trie;
 
 Trie *initializeTrie();
 Trie *createTrie();
-void trieAdd(Trie *trie, char* word);
+int searchTrie(Trie *root, char *key);
+void displayTrie(Trie* root);
 
 #endif
