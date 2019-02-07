@@ -23,17 +23,27 @@ Trie *createTrie(){
     return t;
 }
 
-void trieAdd(Trie *root, char* word){    
-    struct Trie *addTrie = root;
-    int i=0;
-    for(i=0; i< strlen(word); i++){
-        int index = word[i] - 'a'; // posizione lettera nell'alfabero -1 perchè l'indice parte da 0
-        if(!addTrie->children[index])
-            addTrie->children[index] = createTrie();
-
-        addTrie = addTrie->children[index];
-    }
-
-    addTrie->occurrencies++;
+int searchTrie(Trie *root, char *key){
+    Trie *tNode = root; 
+  
+    for (int i=0; i<strlen(key); i++) 
+    { 
+        int index = key[i] - 'a';
+        if(!tNode->children[index])
+            return 0;
+  
+        tNode = tNode->children[index]; 
+    } 
+  
+    return 1; 
 }
 
+void displayTrie(Trie *root){
+    if(root != NULL){
+        if(root->occurrencies>0)
+            printf("%s: %i\n", root->value, root->occurrencies);
+
+        for(int i=0;i<ALPHABET_SIZE;i++)
+            displayTrie(root->children[i]);
+    }
+}
