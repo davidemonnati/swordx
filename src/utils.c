@@ -86,3 +86,9 @@ int cycleDir(char *path, Tree *albero){
     free(complete_path);
     return 1;
 }
+
+char *toLowerCase(char *word){
+    int i = 0;
+    for (i=0; i < strlen(word) + 1; i++) word[i] = tolower(word[i]);
+    return word;
+}
