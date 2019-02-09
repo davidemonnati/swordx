@@ -9,7 +9,7 @@ typedef struct Trie{
     struct Trie *children[ALPHABET_SIZE];
 }Trie;
 
-void _trieAdd(Trie *root, char* word, int index);
+void _displayTrie(Trie* root, char *word, int level);
 
 Trie *createTrie(){
     Trie *t = (Trie*)malloc(sizeof(Trie));
@@ -34,8 +34,7 @@ void trieAdd(Trie *root, char *word){
         if(!t->children[index])
             t->children[index] = createTrie();
         
-        // t->value = word[i-1];
-        t->children[index]->value = word[i];
+        t->children[index]-> value = &word[i];
         t = t->children[index];
     }
 
@@ -55,4 +54,23 @@ int searchTrie(Trie *root, char *key){
     } 
   
     return 1; 
+}
+
+void displayTrie(Trie* root, char *word){
+    _displayTrie(root, word, 0);
+}
+
+void _displayTrie(Trie* root, char *word, int level){
+    int i=0;
+    if (root->occurrencies>0){ 
+        word[level] = '\0'; 
+        printf("%s\n", word);
+    } 
+  
+    for (i = 0; i < ALPHABET_SIZE; i++){ 
+        if (root->children[i]){ 
+            word[level] = i + 'a'; 
+            _displayTrie(root->children[i], word, level + 1); 
+        } 
+    } 
 }
