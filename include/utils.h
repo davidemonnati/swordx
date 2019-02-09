@@ -19,4 +19,4 @@ unsigned char enableFlag(unsigned char flags, unsigned char option);
 int isFile(char *path);
 int isDir(char *path);
 int cycleDir(char *path, Tree *albero);
-
+char *toLowerCase(char *word);
