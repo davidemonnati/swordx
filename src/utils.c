@@ -1,7 +1,6 @@
 
 #include "utils.h"
 
-
 /* File management functions */
 
 FILE *openFileReadMode(char *path){
@@ -59,36 +58,9 @@ int isDir(char *path){
     return 0;
 }
 
-int cycleDir(char *path, Tree *albero){
-    DIR *dir;
-    dir = opendir(path);
-    char *complete_path = (char*)malloc(sizeof(char));
-
-    if(!dir){
-        fprintf(stderr, "swordx: %s, %s\n", path, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    while(dir){
-        struct dirent *entry;
-        char *file_name;
-
-        entry = readdir(dir);
-        if(!entry) break;
-        file_name = entry->d_name;
-        if(!strcmp(file_name, ".") ||!strcmp(file_name, "..")) continue; // non considera le cartelle .. e .
-        sprintf(complete_path, "%s/%s", path, file_name);
-
-        // getWords(albero, complete_path); // DA DECOMMENTARE
-    }
-    closedir(dir);
-
-    free(complete_path);
-    return 1;
-}
-
 char *toLowerCase(char *word){
     int i = 0;
     for (i=0; i < strlen(word) + 1; i++) word[i] = tolower(word[i]);
     return word;
 }
+
