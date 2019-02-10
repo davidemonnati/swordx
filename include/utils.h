@@ -1,3 +1,6 @@
+#ifndef TREE_MODULE_UTILS_H
+#define TREE_MODULE_UTILS_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
@@ -6,8 +9,9 @@
 #include <errno.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <string.h>
+#include <ctype.h>
 
-#include "tree.h"
 #include "stack.h"
 
 FILE *openFileReadMode(char *path);
@@ -18,5 +22,6 @@ void printFlagsValue(unsigned char option);
 unsigned char enableFlag(unsigned char flags, unsigned char option);
 int isFile(char *path);
 int isDir(char *path);
-int cycleDir(char *path, Tree *albero);
 char *toLowerCase(char *word);
+
+#endif
