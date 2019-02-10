@@ -6,11 +6,16 @@
 #include <string.h>
 #include <malloc.h>
 
-typedef struct Trie Trie;
+#include "utils.h"
 
+typedef struct Trie Trie;
+ 
 Trie *createTrie();
 void trieAdd(Trie *root, char *word);
 int searchTrie(Trie *root, char *key);
-void displayTrie(Trie* root, char *words);
+void displayTrie(Trie* root);
+void getWordsToTrie(Trie *root, char *path);
+void writeTrie(Trie *root, char *output);
+int cycleDir(char *path, Trie *root);
 
 #endif
