@@ -4,7 +4,11 @@
 #include <stdio.h>
 #include <malloc.h>
 
-typedef struct BST BST;
+typedef struct BST {
+    struct Trie *node;
+    struct BST *left;
+    struct BST *right;
+} BST;
 
 BST *createBST();
 

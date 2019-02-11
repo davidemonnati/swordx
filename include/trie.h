@@ -5,10 +5,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
-
 #include "utils.h"
 
-typedef struct Trie Trie;
+#define ALPHABET_SIZE 26
+
+typedef struct Trie{
+    char *value;
+    int occurrencies;
+    struct Trie *children[ALPHABET_SIZE];
+}Trie;
  
 Trie *createTrie();
 void trieAdd(Trie *root, char *word);

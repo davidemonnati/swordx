@@ -1,14 +1,6 @@
 
 #include "trie.h"
 
-#define ALPHABET_SIZE 26
-
-typedef struct Trie{
-    char *value;
-    int occurrencies;
-    struct Trie *children[ALPHABET_SIZE];
-}Trie;
-
 void _displayTrie(Trie* root, char *word, int level);
 void _writeTrie(Trie *root, char* word, char *output, int level);
 
