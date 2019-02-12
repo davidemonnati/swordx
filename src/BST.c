@@ -22,10 +22,21 @@ void insertSBT(BST **b, char* word, int occurrencies){
     }
 }
 
-void printBST(BST **b){
+void displayBST(BST **b){
     if(*b != NULL){
-        printBST(&(*b)->left);
+        displayBST(&(*b)->left);
         printf("%s %i\n", (*b)->word, (*b)->occurrencies);
-        printBST(&(*b)->right);
+        displayBST(&(*b)->right);
+    }
+}
+
+void printBST(BST **b, char *output){
+    if(*b != NULL){
+        printBST(&(*b)->left, output);
+        char *str = (char *) malloc(sizeof(char));
+        sprintf(str, "%s %i\n", (*b)->word, (*b)->occurrencies);
+        (output == NULL) ? output = "swordx.out" : NULL;
+        writeFile(openFileWriteMode(output), str);
+        printBST(&(*b)->right, output);
     }
 }
