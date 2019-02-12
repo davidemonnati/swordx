@@ -52,8 +52,6 @@ Mkfile.old
 dkms.conf
 .vscode
 prova
+test
 .directory
-<<<<<<< HEAD
 swordx
-=======
->>>>>>> stable
