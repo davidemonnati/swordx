@@ -3,13 +3,17 @@
 
 #include <stdio.h>
 #include <malloc.h>
+#include <string.h>
 
 typedef struct BST {
-    struct Trie *node;
+    char *word;
+    int occurrencies;
     struct BST *left;
     struct BST *right;
 } BST;
 
-BST *createBST();
+BST **createBST();
+void insertSBT(BST **b, char* word, int occurrencies);
+void printBST(BST **b);
 
 #endif
