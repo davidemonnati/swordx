@@ -4,6 +4,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <getopt.h>
+#include <dirent.h>
 
 #include "utils.h"
 #include "trie.h"
@@ -18,6 +19,7 @@
 #define FLAG_SBO (1<<6)
 #define FLAG_OUTPUT (1<<7)
 
+int cycleDir(char *path, Trie *root, unsigned char flags);
 void sortTrie(BST **b, Trie* root);
 void _sortTrie(BST **b, Trie* root, char *word, int level);
 int main(int argc, char **argv);
@@ -26,20 +28,44 @@ void printHelp();
 
 static struct option const long_opts[] =
         {
-                {"help",             no_argument,       NULL, 'h'},
-                {"recursive",        no_argument,       NULL, 'r'},
-                {"follow",           no_argument,       NULL, 'f'},
-                {"exclude",          required_argument, NULL, 'e'},
+                {"help",             no_argument,       NULL, 'h'}, // help
+                {"recursive",        no_argument,       NULL, 'r'}, // OK
+                {"follow",           no_argument,       NULL, 'f'}, // link
+                {"exclude",          required_argument, NULL, 'e'}, // file da escludere
                 {"alpha",            no_argument,       NULL, 'a'},
-                {"min",              required_argument, NULL, 'm'},
-                {"ignore",           required_argument, NULL, 'i'},
-                {"sortbyoccurrency", no_argument,       NULL, 's'},
-                {"sbo",              no_argument,       NULL, 's'},
-                {"output",           required_argument, NULL, 'o'},
+                {"min",              required_argument, NULL, 'm'}, // vengono considerate solo parole con una lunghezza minima
+                {"ignore",           required_argument, NULL, 'i'}, // elenco di parole da ignorare
+                {"sortbyoccurrency", no_argument,       NULL, 's'}, // OK
+                {"sbo",              no_argument,       NULL, 's'}, // OK
+                {"output",           required_argument, NULL, 'o'}, // OK
                 {"log",              required_argument, NULL, 'l'},
                 {"update",           required_argument, NULL, 'u'},
                 {NULL, 0,                               NULL, 0} // required
         };
+
+int cycleDir(char *path, Trie *root, unsigned char flags){
+    DIR *dir;
+    dir = opendir(path);
+    struct dirent *entry;
+    char *absolute_path = (char*)malloc(sizeof(char));
+
+    if(!dir){
+        fprintf(stderr, "swordx: %s, %s\n", path, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    while((entry=readdir(dir)) != NULL){
+        if(strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")){
+            sprintf(absolute_path, "%s/%s", path, entry->d_name);
+            getWordsToTrie(root, absolute_path);
+            if(isDir(absolute_path) && flagIsActive(FLAG_RECURSIVE, flags)) cycleDir(absolute_path, root, flags);
+        }
+    }
+    closedir(dir);
+
+    free(absolute_path);
+    return 1;
+}
 
 void sortTrie(BST **b, Trie* root){
     char *word = (char*)malloc(sizeof(char));
@@ -75,7 +101,7 @@ int main(int argc, char **argv) {
                 exit(EXIT_SUCCESS);
                 
             case 'r':
-                // do something
+                flags |= FLAG_RECURSIVE;
                 break;
 
             case 'f':
@@ -128,7 +154,7 @@ int main(int argc, char **argv) {
             char *path = argv[argc-1];
             getWordsToTrie(t, path);
         } else if(isDir(argv[argc-1])){
-            cycleDir(argv[argc-1], t);
+            cycleDir(argv[argc-1], t, flags);
         }
         argc--;
     }

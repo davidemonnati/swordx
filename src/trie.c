@@ -108,31 +108,3 @@ void _writeTrie(Trie *root, char* word, char *output, int level){
         } 
     } 
 }
-
-int cycleDir(char *path, Trie *root){
-    DIR *dir;
-    dir = opendir(path);
-    char *complete_path = (char*)malloc(sizeof(char));
-
-    if(!dir){
-        fprintf(stderr, "swordx: %s, %s\n", path, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    while(dir){
-        struct dirent *entry;
-        char *file_name;
-
-        entry = readdir(dir);
-        if(!entry) break;
-        file_name = entry->d_name;
-        if(!strcmp(file_name, ".") ||!strcmp(file_name, "..")) continue; // non considera le cartelle .. e .
-        sprintf(complete_path, "%s/%s", path, file_name);
-
-        getWordsToTrie(root, complete_path);
-    }
-    closedir(dir);
-
-    free(complete_path);
-    return 1;
-}

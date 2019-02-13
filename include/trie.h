@@ -21,6 +21,5 @@ int searchTrie(Trie *root, char *key);
 void displayTrie(Trie* root);
 void getWordsToTrie(Trie *root, char *path);
 void writeTrie(Trie *root, char *output);
-int cycleDir(char *path, Trie *root);
 
 #endif
