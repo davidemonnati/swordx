@@ -1,5 +1,5 @@
 
-#include "../include/stack.h"
+#include "stack.h"
 
 typedef struct Stack{
     char *value;
@@ -25,17 +25,17 @@ void *push(Stack *stack, char *word) {
     return stack;
 }
 
-void pop(Stack *head){
+char *pop(Stack *head){
+    char *headValue = head->value;
     if(head->value == NULL){
-        perror("SWORDX: Impossibile effettuare il pop, lo stack è vuoto");
-        exit(EXIT_FAILURE);
+        // perror("SWORDX: Error, stack is empty.");
+        // exit(EXIT_FAILURE);
     }
-
     Stack *tmp = initializeNode();
-    printf("%s\n", head->value);
     *tmp = *head->next;
     *head = *tmp;
     free(tmp);
+    return headValue;
 }
 
 void printStack(Stack *head) {
@@ -44,17 +44,13 @@ void printStack(Stack *head) {
     return printStack(head->next);
 }
 
-char *getStackValue(Stack *head){
+char *getTopStack(Stack *head){
     return head->value;
-}
-
-Stack *getNextStackElement(Stack *head){
-    return head->next;
 }
 
 int searchStackElement(Stack *head, char *value) {
     int i = 0;
-    while (head != NULL) {
+    while (head->value != NULL) {
         if (strcmp(head->value, value) == 0) {
             i++;
             return i;
@@ -64,4 +60,9 @@ int searchStackElement(Stack *head, char *value) {
     }
 
     return i;
+}
+
+int stackIsEmpty(Stack *head){
+    if(head->value == NULL) return 1;
+    return 0;
 }

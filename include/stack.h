@@ -12,11 +12,10 @@ typedef struct Stack Stack;
 
 Stack *initializeNode();
 void *push(Stack *stack, char *word);
-void pop(Stack *head);
+char *pop(Stack *head);
 void printStack(Stack *head);
-char *getStackValue(Stack *head);
-Stack *getNextStackElement(Stack *head);
+char *getTopStack(Stack *head);
 int searchStackElement(Stack *head, char *value);
-
+int stackIsEmpty(Stack *head);
 
 #endif //TREE_MODULE_STACK_H
