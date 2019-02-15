@@ -6,9 +6,7 @@ void _writeTrie(Trie *root, char* word, char *output, int level);
 
 Trie *createTrie(){
     Trie *t = (Trie*)malloc(sizeof(Trie));
-    t->value = NULL;
     t->occurrencies = 0;
-
     int i=0;
 
     for(i=0; i<ALPHABET_SIZE; i++){
@@ -18,16 +16,24 @@ Trie *createTrie(){
     return t;
 }
 
+int getIndex(char c){
+    if(isdigit(c))
+        return c - '0';
+    else
+        return c - 'a' + 10;
+}
+
 void trieAdd(Trie *root, char *word){
     Trie *t = createTrie();
     t = root;
     
     for(int i=0; i<strlen(word); i++){
-        int index = word[i] - 'a'; // posizione lettera nell'alfabero -1 perchè l'indice parte da 0
+        int index = getIndex(word[i]);
+
         if(!t->children[index])
             t->children[index] = createTrie();
         
-        t->children[index]-> value = &word[i];
+        t->children[index]->value = word[i];
         t = t->children[index];
     }
 
@@ -64,7 +70,7 @@ void _displayTrie(Trie* root, char *word, int level){
   
     for (i = 0; i < ALPHABET_SIZE; i++){ 
         if (root->children[i]){ 
-            word[level] = i + 'a'; 
+            word[level] = root->children[i]->value;
             _displayTrie(root->children[i], word, level + 1); 
         } 
     } 
@@ -75,7 +81,7 @@ void getWordsToTrie(Trie *root, char *path){
     char *buffer, *word;
     size_t linesize = 0;
 
-    while (getline(&buffer, &linesize, rFile) > 0) {
+    while (getline(&buffer, &linesize, rFile) > 0){
         word = strtok(buffer, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
         while (word != NULL) {
             trieAdd(root, toLowerCase(word));
@@ -102,8 +108,8 @@ void _writeTrie(Trie *root, char* word, char *output, int level){
     } 
   
     for (i = 0; i < ALPHABET_SIZE; i++){ 
-        if (root->children[i]){ 
-            word[level] = i + 'a'; 
+        if (root->children[i]){
+            word[level] = root->children[i]->value;
             _writeTrie(root->children[i], word, output, level + 1); 
         } 
     } 

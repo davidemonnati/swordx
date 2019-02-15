@@ -7,15 +7,16 @@
 #include <malloc.h>
 #include "utils.h"
 
-#define ALPHABET_SIZE 26
+#define ALPHABET_SIZE 36
 
 typedef struct Trie{
-    char *value;
+    char value;
     int occurrencies;
     struct Trie *children[ALPHABET_SIZE];
 }Trie;
  
 Trie *createTrie();
+int getIndex(char c);
 void trieAdd(Trie *root, char *word);
 int searchTrie(Trie *root, char *key);
 void displayTrie(Trie* root);
