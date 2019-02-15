@@ -16,11 +16,9 @@ typedef struct Trie{
 }Trie;
  
 Trie *createTrie();
-int getIndex(char c);
 void trieAdd(Trie *root, char *word);
 int searchTrie(Trie *root, char *key);
 void displayTrie(Trie* root);
-void getWordsToTrie(Trie *root, char *path);
 void writeTrie(Trie *root, char *output);
 
 #endif

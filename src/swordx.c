@@ -20,21 +20,23 @@
 #define FLAG_SBO (1<<6)
 #define FLAG_OUTPUT (1<<7)
 
-int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles);
+int isAlphanumeric(char *word);
+int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min);
 void sortTrie(BST **b, Trie* root);
 void _sortTrie(BST **b, Trie* root, char *word, int level);
+void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min);
 int main(int argc, char **argv);
 void usage(char *programname);
 void help(char *programname);
 
 static struct option const long_opts[] =
         {
-                {"help",             no_argument,       NULL, 'h'}, // help
+                {"help",             no_argument,       NULL, 'h'}, // OK
                 {"recursive",        no_argument,       NULL, 'r'}, // OK
                 {"follow",           no_argument,       NULL, 'f'}, // link
                 {"exclude",          required_argument, NULL, 'e'}, // OK
-                {"alpha",            no_argument,       NULL, 'a'},
-                {"min",              required_argument, NULL, 'm'}, // vengono considerate solo parole con una lunghezza minima
+                {"alpha",            no_argument,       NULL, 'a'}, // alpha
+                {"min",              required_argument, NULL, 'm'}, // OK
                 {"ignore",           required_argument, NULL, 'i'}, // elenco di parole da ignorare
                 {"sortbyoccurrency", no_argument,       NULL, 's'}, // OK
                 {"sbo",              no_argument,       NULL, 's'}, // OK
@@ -44,7 +46,14 @@ static struct option const long_opts[] =
                 {NULL, 0,                               NULL, 0} // required
         };
 
-int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles){
+int isAlphanumeric(char *word) {
+	for(int i = 0; i < strlen(word); i++)
+		if(isdigit(word[i]))
+            return 1;
+    return 0;
+}
+
+int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min){
     DIR *dir;
     dir = opendir(path);
     struct dirent *entry;
@@ -58,8 +67,9 @@ int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles){
     while((entry=readdir(dir)) != NULL){
         if(strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..") && !searchStackElement(excludeFiles, entry->d_name)){
             sprintf(absolute_path, "%s/%s", path, entry->d_name);
-            getWordsToTrie(root, absolute_path);
-            if(isDir(absolute_path) && flagIsActive(FLAG_RECURSIVE, flags)) cycleDir(absolute_path, root, flags, excludeFiles);
+            getWordsToTrie(root, absolute_path, flags, min);
+            if(isDir(absolute_path) && flagIsActive(FLAG_RECURSIVE, flags))
+                cycleDir(absolute_path, root, flags, excludeFiles, min);
         }
     }
     closedir(dir);
@@ -82,14 +92,32 @@ void _sortTrie(BST **b, Trie* root, char *word, int level){
   
     for (i = 0; i < ALPHABET_SIZE; i++){ 
         if (root->children[i]){ 
-            word[level] = i + 'a'; 
+            word[level] = root->children[i]->value;
             _sortTrie(b, root->children[i], word, level + 1);
         } 
     }
 }
 
+void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min){
+    FILE *rFile = openFileReadMode(path);
+    char *buffer, *word;
+    size_t linesize = 0;
+
+    while (getline(&buffer, &linesize, rFile) > 0){
+        word = strtok(buffer, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
+        while (word != NULL) { 
+
+            if(strlen(word) >= min)
+                trieAdd(root, toLowerCase(word));
+
+            word = strtok(NULL, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
+        }
+    }
+    fclose(rFile);
+}
+
 int main(int argc, char **argv) {
-    int c;
+    int c, min=0;
     char *output = NULL;
     unsigned char flags = 0;
     Trie *t = createTrie();
@@ -117,11 +145,12 @@ int main(int argc, char **argv) {
                 break;
 
             case  'a':
+                flags |= FLAG_ALPHA;
                 // do something
                 break;
             
             case 'm':
-                // do something
+                min = atoi(optarg);
                 break;
 
             case 'i':
@@ -156,9 +185,9 @@ int main(int argc, char **argv) {
     while(argc > 1){
         if(isFile(argv[argc-1])){
             char *path = argv[argc-1];
-            getWordsToTrie(t, path);
+            getWordsToTrie(t, path, flags, min);
         } else if(isDir(argv[argc-1])){
-            cycleDir(argv[argc-1], t, flags, excludeFiles);
+            cycleDir(argv[argc-1], t, flags, excludeFiles, min);
         }
         argc--;
     }
@@ -167,7 +196,9 @@ int main(int argc, char **argv) {
     if(flagIsActive(FLAG_SBO, flags)){
         sortTrie(sbo, t);
         printBST(sbo, output);
-    }else writeTrie(t, output);
+    }else{
+        writeTrie(t, output);
+    }
     
     free(t);
     free(sbo);

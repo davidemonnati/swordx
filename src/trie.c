@@ -1,6 +1,7 @@
 
 #include "trie.h"
 
+int getIndex(char c);
 void _displayTrie(Trie* root, char *word, int level);
 void _writeTrie(Trie *root, char* word, char *output, int level);
 
@@ -41,7 +42,7 @@ void trieAdd(Trie *root, char *word){
 }
 
 int searchTrie(Trie *root, char *key){
-    Trie *tNode = root; 
+    Trie *tNode = root;
   
     for (int i=0; i<strlen(key); i++) 
     { 
@@ -74,21 +75,6 @@ void _displayTrie(Trie* root, char *word, int level){
             _displayTrie(root->children[i], word, level + 1); 
         } 
     } 
-}
-
-void getWordsToTrie(Trie *root, char *path){
-    FILE *rFile = openFileReadMode(path);
-    char *buffer, *word;
-    size_t linesize = 0;
-
-    while (getline(&buffer, &linesize, rFile) > 0){
-        word = strtok(buffer, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
-        while (word != NULL) {
-            trieAdd(root, toLowerCase(word));
-            word = strtok(NULL, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
-        }
-    }
-    fclose(rFile);
 }
 
 void writeTrie(Trie *root, char *output){
