@@ -46,7 +46,7 @@ int searchTrie(Trie *root, char *key){
   
     for (int i=0; i<strlen(key); i++) 
     { 
-        int index = key[i] - 'a';
+        int index = key[i] - 'a' + 10;
         if(!tNode->children[index])
             return 0;
   
