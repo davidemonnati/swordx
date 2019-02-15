@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "trie.h"
 #include "BST.h"
+#include "stack.h"
 
 #define FLAG_RECURSIVE (1<<0)
 #define FLAG_FOLLOW (1<<1)
@@ -19,7 +20,7 @@
 #define FLAG_SBO (1<<6)
 #define FLAG_OUTPUT (1<<7)
 
-int cycleDir(char *path, Trie *root, unsigned char flags);
+int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles);
 void sortTrie(BST **b, Trie* root);
 void _sortTrie(BST **b, Trie* root, char *word, int level);
 int main(int argc, char **argv);
@@ -31,7 +32,7 @@ static struct option const long_opts[] =
                 {"help",             no_argument,       NULL, 'h'}, // help
                 {"recursive",        no_argument,       NULL, 'r'}, // OK
                 {"follow",           no_argument,       NULL, 'f'}, // link
-                {"exclude",          required_argument, NULL, 'e'}, // file da escludere
+                {"exclude",          required_argument, NULL, 'e'}, // OK
                 {"alpha",            no_argument,       NULL, 'a'},
                 {"min",              required_argument, NULL, 'm'}, // vengono considerate solo parole con una lunghezza minima
                 {"ignore",           required_argument, NULL, 'i'}, // elenco di parole da ignorare
@@ -43,7 +44,7 @@ static struct option const long_opts[] =
                 {NULL, 0,                               NULL, 0} // required
         };
 
-int cycleDir(char *path, Trie *root, unsigned char flags){
+int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles){
     DIR *dir;
     dir = opendir(path);
     struct dirent *entry;
@@ -55,10 +56,10 @@ int cycleDir(char *path, Trie *root, unsigned char flags){
     }
 
     while((entry=readdir(dir)) != NULL){
-        if(strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")){
+        if(strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..") && !searchStackElement(excludeFiles, entry->d_name)){
             sprintf(absolute_path, "%s/%s", path, entry->d_name);
             getWordsToTrie(root, absolute_path);
-            if(isDir(absolute_path) && flagIsActive(FLAG_RECURSIVE, flags)) cycleDir(absolute_path, root, flags);
+            if(isDir(absolute_path) && flagIsActive(FLAG_RECURSIVE, flags)) cycleDir(absolute_path, root, flags, excludeFiles);
         }
     }
     closedir(dir);
@@ -93,6 +94,7 @@ int main(int argc, char **argv) {
     unsigned char flags = 0;
     Trie *t = createTrie();
     BST **sbo = createBST(); 
+    Stack *excludeFiles = initializeNode();
 
     while ((c = getopt_long(argc, argv, "hrfeamisolu", long_opts, NULL)) != -1) {
         switch (c) {
@@ -109,7 +111,9 @@ int main(int argc, char **argv) {
                 break;
                 
             case 'e':
-                // do something
+                flags |= FLAG_EXCLUDE;
+                for (; optind < argc && *argv[optind] != '-'; optind++)
+                    push(excludeFiles, argv[optind]);
                 break;
 
             case  'a':
@@ -154,7 +158,7 @@ int main(int argc, char **argv) {
             char *path = argv[argc-1];
             getWordsToTrie(t, path);
         } else if(isDir(argv[argc-1])){
-            cycleDir(argv[argc-1], t, flags);
+            cycleDir(argv[argc-1], t, flags, excludeFiles);
         }
         argc--;
     }
