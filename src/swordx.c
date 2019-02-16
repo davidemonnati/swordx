@@ -36,7 +36,7 @@ static struct option const long_opts[] =
                 {"recursive",        no_argument,       NULL, 'r'}, // OK
                 {"follow",           no_argument,       NULL, 'f'}, // link
                 {"exclude",          required_argument, NULL, 'e'}, // OK
-                {"alpha",            no_argument,       NULL, 'a'}, // alpha
+                {"alpha",            no_argument,       NULL, 'a'}, // OK
                 {"min",              required_argument, NULL, 'm'}, // OK
                 {"ignore",           required_argument, NULL, 'i'}, // OK
                 {"sortbyoccurrency", no_argument,       NULL, 's'}, // OK
@@ -160,9 +160,7 @@ int main(int argc, char **argv) {
                 
             case 'e':
                 flags |= FLAG_EXCLUDE;
-                optind--;
-                for (; optind < argc && *argv[optind] != '-'; optind++)
-                    push(excludeFiles, argv[optind]);
+                push(excludeFiles, optarg);
                 break;
 
             case 'a':
