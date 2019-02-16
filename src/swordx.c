@@ -20,22 +20,25 @@
 #define FLAG_SBO (1<<6)
 #define FLAG_OUTPUT (1<<7)
 
-int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles);
+void getIgnoredWords(Trie* ignoreTrie, char *path);
+int isAlphanumeric(char *word);
+int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min, Trie *ignoredWords);
 void sortTrie(BST **b, Trie* root);
 void _sortTrie(BST **b, Trie* root, char *word, int level);
+void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords);
 int main(int argc, char **argv);
 void usage(char *programname);
 void help(char *programname);
 
 static struct option const long_opts[] =
         {
-                {"help",             no_argument,       NULL, 'h'}, // help
+                {"help",             no_argument,       NULL, 'h'}, // OK
                 {"recursive",        no_argument,       NULL, 'r'}, // OK
                 {"follow",           no_argument,       NULL, 'f'}, // link
                 {"exclude",          required_argument, NULL, 'e'}, // OK
-                {"alpha",            no_argument,       NULL, 'a'},
-                {"min",              required_argument, NULL, 'm'}, // vengono considerate solo parole con una lunghezza minima
-                {"ignore",           required_argument, NULL, 'i'}, // elenco di parole da ignorare
+                {"alpha",            no_argument,       NULL, 'a'}, // alpha
+                {"min",              required_argument, NULL, 'm'}, // OK
+                {"ignore",           required_argument, NULL, 'i'}, // OK
                 {"sortbyoccurrency", no_argument,       NULL, 's'}, // OK
                 {"sbo",              no_argument,       NULL, 's'}, // OK
                 {"output",           required_argument, NULL, 'o'}, // OK
@@ -44,7 +47,30 @@ static struct option const long_opts[] =
                 {NULL, 0,                               NULL, 0} // required
         };
 
-int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles){
+void getIgnoredWords(Trie* ignoreTrie, char *path){
+    FILE *rFile = fopen(path, "r");
+    char *buffer, *str;
+    size_t linesize = 0;
+
+    if(rFile == NULL) perror("Error opening file");
+
+    while (getline(&buffer, &linesize, rFile) > 0){
+        str = strtok(buffer, " .,:;\n");
+        while(str != NULL){
+            trieAdd(ignoreTrie, str);
+            str = strtok(NULL, " .,:;\n");
+        } 
+    }
+}
+
+int isAlphanumeric(char *word) {
+	for(int i = 0; i < strlen(word); i++)
+		if(isdigit(word[i]))
+            return 1;
+    return 0;
+}
+
+int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min, Trie *ignoredWords){
     DIR *dir;
     dir = opendir(path);
     struct dirent *entry;
@@ -56,10 +82,11 @@ int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles){
     }
 
     while((entry=readdir(dir)) != NULL){
-        if(strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..") && !searchStackElement(excludeFiles, entry->d_name)){
-            sprintf(absolute_path, "%s/%s", path, entry->d_name);
-            getWordsToTrie(root, absolute_path);
-            if(isDir(absolute_path) && flagIsActive(FLAG_RECURSIVE, flags)) cycleDir(absolute_path, root, flags, excludeFiles);
+        sprintf(absolute_path, "%s/%s", path, entry->d_name);
+        if(strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..") && !searchStackElement(excludeFiles, absolute_path) ){
+            getWordsToTrie(root, absolute_path, flags, min, ignoredWords);
+            if(isDir(absolute_path) && flagIsActive(FLAG_RECURSIVE, flags))
+                cycleDir(absolute_path, root, flags, excludeFiles, min, ignoredWords);
         }
     }
     closedir(dir);
@@ -82,17 +109,38 @@ void _sortTrie(BST **b, Trie* root, char *word, int level){
   
     for (i = 0; i < ALPHABET_SIZE; i++){ 
         if (root->children[i]){ 
-            word[level] = i + 'a'; 
+            word[level] = root->children[i]->value;
             _sortTrie(b, root->children[i], word, level + 1);
         } 
     }
 }
 
+void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords){
+    FILE *rFile = openFileReadMode(path);
+    char *buffer, *word;
+    size_t linesize = 0;
+
+    while (getline(&buffer, &linesize, rFile) > 0){
+        word = strtok(buffer, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
+        while (word != NULL) { 
+
+            if((!flagIsActive(FLAG_ALPHA, flags) || !isAlphanumeric(word))){
+                if(strlen(word) >= min && !searchTrie(ignoredWords, word))
+                    trieAdd(root, toLowerCase(word));
+            }
+
+            word = strtok(NULL, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
+        }
+    }
+    fclose(rFile);
+}
+
 int main(int argc, char **argv) {
-    int c;
+    int c, min=0, nparams=0;
     char *output = NULL;
     unsigned char flags = 0;
     Trie *t = createTrie();
+    Trie *ignoredWords = createTrie();
     BST **sbo = createBST(); 
     Stack *excludeFiles = initializeNode();
 
@@ -112,20 +160,21 @@ int main(int argc, char **argv) {
                 
             case 'e':
                 flags |= FLAG_EXCLUDE;
+                optind--;
                 for (; optind < argc && *argv[optind] != '-'; optind++)
                     push(excludeFiles, argv[optind]);
                 break;
 
-            case  'a':
-                // do something
+            case 'a':
+                flags |= FLAG_ALPHA;
                 break;
             
             case 'm':
-                // do something
+                min = atoi(optarg);
                 break;
 
             case 'i':
-                // do something
+                getIgnoredWords(ignoredWords, optarg);
                 break;
 
             case 's':
@@ -147,27 +196,30 @@ int main(int argc, char **argv) {
         }
     }
 
+    nparams = argc-optind; // number of files and folders
+
     if(argc < 2){
         fprintf(stderr, "swordx: no input files or directory\n");
         usage(argv[0]);
         exit(EXIT_FAILURE);
     }
     
-    while(argc > 1){
+    for(int i = 0; i<nparams; i++){
         if(isFile(argv[argc-1])){
             char *path = argv[argc-1];
-            getWordsToTrie(t, path);
+            getWordsToTrie(t, path, flags, min, ignoredWords);
         } else if(isDir(argv[argc-1])){
-            cycleDir(argv[argc-1], t, flags, excludeFiles);
+            cycleDir(argv[argc-1], t, flags, excludeFiles, min, ignoredWords);
         }
-        argc--;
     }
 
     // controllo se c'è SBO attivo
     if(flagIsActive(FLAG_SBO, flags)){
         sortTrie(sbo, t);
         printBST(sbo, output);
-    }else writeTrie(t, output);
+    }else{
+        writeTrie(t, output);
+    }
     
     free(t);
     free(sbo);

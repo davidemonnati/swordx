@@ -1,14 +1,13 @@
 
 #include "trie.h"
 
+int getIndex(char c);
 void _displayTrie(Trie* root, char *word, int level);
 void _writeTrie(Trie *root, char* word, char *output, int level);
 
 Trie *createTrie(){
     Trie *t = (Trie*)malloc(sizeof(Trie));
-    t->value = NULL;
     t->occurrencies = 0;
-
     int i=0;
 
     for(i=0; i<ALPHABET_SIZE; i++){
@@ -18,16 +17,24 @@ Trie *createTrie(){
     return t;
 }
 
+int getIndex(char c){
+    if(isdigit(c))
+        return c - '0';
+    else
+        return c - 'a' + 10;
+}
+
 void trieAdd(Trie *root, char *word){
     Trie *t = createTrie();
     t = root;
     
     for(int i=0; i<strlen(word); i++){
-        int index = word[i] - 'a'; // posizione lettera nell'alfabero -1 perchè l'indice parte da 0
+        int index = getIndex(word[i]);
+
         if(!t->children[index])
             t->children[index] = createTrie();
         
-        t->children[index]-> value = &word[i];
+        t->children[index]->value = word[i];
         t = t->children[index];
     }
 
@@ -35,11 +42,11 @@ void trieAdd(Trie *root, char *word){
 }
 
 int searchTrie(Trie *root, char *key){
-    Trie *tNode = root; 
+    Trie *tNode = root;
   
     for (int i=0; i<strlen(key); i++) 
     { 
-        int index = key[i] - 'a';
+        int index = key[i] - 'a' + 10;
         if(!tNode->children[index])
             return 0;
   
@@ -64,25 +71,10 @@ void _displayTrie(Trie* root, char *word, int level){
   
     for (i = 0; i < ALPHABET_SIZE; i++){ 
         if (root->children[i]){ 
-            word[level] = i + 'a'; 
+            word[level] = root->children[i]->value;
             _displayTrie(root->children[i], word, level + 1); 
         } 
     } 
-}
-
-void getWordsToTrie(Trie *root, char *path){
-    FILE *rFile = openFileReadMode(path);
-    char *buffer, *word;
-    size_t linesize = 0;
-
-    while (getline(&buffer, &linesize, rFile) > 0) {
-        word = strtok(buffer, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
-        while (word != NULL) {
-            trieAdd(root, toLowerCase(word));
-            word = strtok(NULL, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
-        }
-    }
-    fclose(rFile);
 }
 
 void writeTrie(Trie *root, char *output){
@@ -102,8 +94,8 @@ void _writeTrie(Trie *root, char* word, char *output, int level){
     } 
   
     for (i = 0; i < ALPHABET_SIZE; i++){ 
-        if (root->children[i]){ 
-            word[level] = i + 'a'; 
+        if (root->children[i]){
+            word[level] = root->children[i]->value;
             _writeTrie(root->children[i], word, output, level + 1); 
         } 
     } 
