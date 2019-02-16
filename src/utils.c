@@ -1,27 +1,6 @@
 
 #include "utils.h"
 
-/* File management functions */
-
-FILE *openFileReadMode(char *path){
-    FILE *rf = fopen(path, "r");
-    if(!rf){
-        fprintf(stderr, "swordx: %s, %s\n", path, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-    return rf;
-}
-
-FILE *openFileWriteMode(char *path){
-    FILE *wf = fopen(path, "a");
-    return wf;
-}
-
-void writeFile(FILE *file, char *value){
-    fputs(value, file);
-    fclose(file);
-}
-
 /* Option and flag management functions */
 
 int flagIsActive(unsigned char option, unsigned char flags){

@@ -29,14 +29,3 @@ void displayBST(BST **b){
         displayBST(&(*b)->right);
     }
 }
-
-void printBST(BST **b, char *output){
-    if(*b != NULL){
-        printBST(&(*b)->left, output);
-        char *str = (char *) malloc(sizeof(char));
-        sprintf(str, "%s %i\n", (*b)->word, (*b)->occurrencies);
-        (output == NULL) ? output = "swordx.out" : NULL;
-        writeFile(openFileWriteMode(output), str);
-        printBST(&(*b)->right, output);
-    }
-}
