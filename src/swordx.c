@@ -124,8 +124,10 @@ void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *
         word = strtok(buffer, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
         while (word != NULL) { 
 
-            if(strlen(word) >= min && !searchTrie(ignoredWords, word))
-                trieAdd(root, toLowerCase(word));
+            if((!flagIsActive(FLAG_ALPHA, flags) || !isAlphanumeric(word))){
+                if(strlen(word) >= min && !searchTrie(ignoredWords, word))
+                    trieAdd(root, toLowerCase(word));
+            }
 
             word = strtok(NULL, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
         }
