@@ -82,8 +82,8 @@ int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, i
     }
 
     while((entry=readdir(dir)) != NULL){
-        if(strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..") && !searchStackElement(excludeFiles, entry->d_name)){
-            sprintf(absolute_path, "%s/%s", path, entry->d_name);
+        sprintf(absolute_path, "%s/%s", path, entry->d_name);
+        if(strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..") && !searchStackElement(excludeFiles, absolute_path) ){
             getWordsToTrie(root, absolute_path, flags, min, ignoredWords);
             if(isDir(absolute_path) && flagIsActive(FLAG_RECURSIVE, flags))
                 cycleDir(absolute_path, root, flags, excludeFiles, min, ignoredWords);
@@ -134,7 +134,7 @@ void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *
 }
 
 int main(int argc, char **argv) {
-    int c, min=0;
+    int c, min=0, nparams=0;
     char *output = NULL;
     unsigned char flags = 0;
     Trie *t = createTrie();
@@ -165,7 +165,6 @@ int main(int argc, char **argv) {
 
             case 'a':
                 flags |= FLAG_ALPHA;
-                // do something
                 break;
             
             case 'm':
@@ -195,20 +194,21 @@ int main(int argc, char **argv) {
         }
     }
 
+    nparams = argc-optind; // number of files and folders
+
     if(argc < 2){
         fprintf(stderr, "swordx: no input files or directory\n");
         usage(argv[0]);
         exit(EXIT_FAILURE);
     }
     
-    while(argc > 1){
+    for(int i = 0; i<nparams; i++){
         if(isFile(argv[argc-1])){
             char *path = argv[argc-1];
             getWordsToTrie(t, path, flags, min, ignoredWords);
         } else if(isDir(argv[argc-1])){
             cycleDir(argv[argc-1], t, flags, excludeFiles, min, ignoredWords);
         }
-        argc--;
     }
 
     // controllo se c'è SBO attivo
