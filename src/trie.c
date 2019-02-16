@@ -3,7 +3,6 @@
 
 int getIndex(char c);
 void _displayTrie(Trie* root, char *word, int level);
-void _writeTrie(Trie *root, char* word, char *output, int level);
 
 Trie *createTrie(){
     Trie *t = (Trie*)malloc(sizeof(Trie));
@@ -73,30 +72,6 @@ void _displayTrie(Trie* root, char *word, int level){
         if (root->children[i]){ 
             word[level] = root->children[i]->value;
             _displayTrie(root->children[i], word, level + 1); 
-        } 
-    } 
-}
-
-void writeTrie(Trie *root, char *output){
-    char *word = (char*)malloc(sizeof(char));
-    _writeTrie(root, word, output, 0);
-    free(word);
-}
-
-void _writeTrie(Trie *root, char* word, char *output, int level){
-    int i=0;
-    if (root->occurrencies>0){
-        char *str = (char*)malloc(sizeof(char));
-        word[level] = '\0'; 
-        sprintf(str, "%s %i\n", word, root->occurrencies);
-        (output == NULL) ? output = "swordx.out" : NULL;
-        writeFile(openFileWriteMode(output), str);
-    } 
-  
-    for (i = 0; i < ALPHABET_SIZE; i++){ 
-        if (root->children[i]){
-            word[level] = root->children[i]->value;
-            _writeTrie(root->children[i], word, output, level + 1); 
         } 
     } 
 }

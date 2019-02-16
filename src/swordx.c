@@ -26,6 +26,10 @@ int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, i
 void sortTrie(BST **b, Trie* root);
 void _sortTrie(BST **b, Trie* root, char *word, int level);
 void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords);
+void printBST(BST **b, char *output);
+void writeTrie(Trie *root, char *output);
+void _writeTrie(Trie *root, char* word, char *output, int level);
+void writeFile(FILE *file, char *value);
 int main(int argc, char **argv);
 void usage(char *programname);
 void help(char *programname);
@@ -116,7 +120,7 @@ void _sortTrie(BST **b, Trie* root, char *word, int level){
 }
 
 void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords){
-    FILE *rFile = openFileReadMode(path);
+    FILE *rFile = fopen(path, "r");
     char *buffer, *word;
     size_t linesize = 0;
 
@@ -133,6 +137,50 @@ void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *
         }
     }
     fclose(rFile);
+}
+
+/* NEW FUNCTIONS */
+
+void printBST(BST **b, char *output){
+    if(*b != NULL){
+        printBST(&(*b)->left, output);
+        char *str = (char *) malloc(sizeof(char));
+        sprintf(str, "%s %i\n", (*b)->word, (*b)->occurrencies);
+        (output == NULL) ? output = "swordx.out" : NULL;
+        FILE *pf = fopen(output, "a");
+        writeFile(pf, str);
+        printBST(&(*b)->right, output);
+    }
+}
+
+void writeTrie(Trie *root, char *output){
+    char *word = (char*)malloc(sizeof(char));
+    _writeTrie(root, word, output, 0);
+    free(word);
+}
+
+void _writeTrie(Trie *root, char* word, char *output, int level){
+    int i=0;
+    if (root->occurrencies>0){
+        char *str = (char*)malloc(sizeof(char));
+        word[level] = '\0'; 
+        sprintf(str, "%s %i\n", word, root->occurrencies);
+        (output == NULL) ? output = "swordx.out" : NULL;
+        FILE *pf = fopen(output, "a");
+        writeFile(pf, str);
+    } 
+  
+    for (i = 0; i < ALPHABET_SIZE; i++){ 
+        if (root->children[i]){
+            word[level] = root->children[i]->value;
+            _writeTrie(root->children[i], word, output, level + 1); 
+        } 
+    } 
+}
+
+void writeFile(FILE *file, char *value){
+    fputs(value, file);
+    fclose(file);
 }
 
 int main(int argc, char **argv) {
