@@ -15,24 +15,25 @@
 #define FLAG_FOLLOW (1<<1)
 #define FLAG_EXCLUDE (1<<2)
 #define FLAG_ALPHA (1<<3)
-#define FLAG_MIN (1<<4)
-#define FLAG_IGNORE (1<<5)
-#define FLAG_SBO (1<<6)
-#define FLAG_OUTPUT (1<<7)
+#define FLAG_SBO (1<<4)
+// #define FLAG_MIN (1<<4)
+// #define FLAG_IGNORE (1<<5)
 
+// #define FLAG_OUTPUT (1<<7)
+
+FILE *readFile(char *path);
+FILE *writeFile(char *output);
 void getIgnoredWords(Trie* ignoreTrie, char *path);
 int isAlphanumeric(char *word);
 int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min, Trie *ignoredWords);
-void sortTrie(BST **b, Trie* root);
-void _sortTrie(BST **b, Trie* root, char *word, int level);
+void sortTrie(BST **b, Trie* root, char *word, int level);
 void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords);
-void printBST(BST **b, char *output);
-void writeTrie(Trie *root, char *output);
-void _writeTrie(Trie *root, char* word, char *output, int level);
-void writeFile(FILE *file, char *value);
+void printBST(BST **b, FILE *pf);
+void writeTrie(Trie *root, char* word, FILE *pf, int level);
+void printInfo(FILE *pf, char *value, int occ);
 int main(int argc, char **argv);
-void usage(char *programname);
-void help(char *programname);
+void usage(char *programName);
+void help(char *programName);
 
 static struct option const long_opts[] =
         {
@@ -51,8 +52,24 @@ static struct option const long_opts[] =
                 {NULL, 0,                               NULL, 0} // required
         };
 
+FILE *readFile(char *path){
+    FILE *pf = fopen(path, "rb");
+    if(pf == NULL){
+        perror("Error reading file");
+    }
+    return pf;
+}
+
+FILE *writeFile(char *output){
+    FILE *pf = fopen(output, "wb");
+    if(pf == NULL){
+        perror("Error writing file");
+    }
+    return pf;
+}
+
 void getIgnoredWords(Trie* ignoreTrie, char *path){
-    FILE *rFile = fopen(path, "r");
+    FILE *rFile = readFile(path);
     char *buffer, *str;
     size_t linesize = 0;
 
@@ -99,12 +116,7 @@ int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, i
     return 1;
 }
 
-void sortTrie(BST **b, Trie* root){
-    char *word = (char*)malloc(sizeof(char));
-    _sortTrie(b, root, word, 0);
-}
-
-void _sortTrie(BST **b, Trie* root, char *word, int level){
+void sortTrie(BST **b, Trie* root, char *word, int level){
     int i=0;
     if (root->occurrencies>0){ 
         word[level] = '\0';
@@ -114,13 +126,13 @@ void _sortTrie(BST **b, Trie* root, char *word, int level){
     for (i = 0; i < ALPHABET_SIZE; i++){ 
         if (root->children[i]){ 
             word[level] = root->children[i]->value;
-            _sortTrie(b, root->children[i], word, level + 1);
+            sortTrie(b, root->children[i], word, level + 1);
         } 
     }
 }
 
 void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords){
-    FILE *rFile = fopen(path, "r");
+    FILE *rFile = readFile(path);
     char *buffer, *word;
     size_t linesize = 0;
 
@@ -139,48 +151,31 @@ void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *
     fclose(rFile);
 }
 
-/* NEW FUNCTIONS */
-
-void printBST(BST **b, char *output){
+void printBST(BST **b, FILE *pf){
     if(*b != NULL){
-        printBST(&(*b)->left, output);
-        char *str = (char *) malloc(sizeof(char));
-        sprintf(str, "%s %i\n", (*b)->word, (*b)->occurrencies);
-        (output == NULL) ? output = "swordx.out" : NULL;
-        FILE *pf = fopen(output, "a");
-        writeFile(pf, str);
-        printBST(&(*b)->right, output);
+        printBST(&(*b)->left, pf);
+        printInfo(pf, (*b)->word, (*b)->occurrencies);
+        printBST(&(*b)->right, pf);
     }
 }
 
-void writeTrie(Trie *root, char *output){
-    char *word = (char*)malloc(sizeof(char));
-    _writeTrie(root, word, output, 0);
-    free(word);
-}
-
-void _writeTrie(Trie *root, char* word, char *output, int level){
+void writeTrie(Trie *root, char* word, FILE *pf, int level){
     int i=0;
     if (root->occurrencies>0){
-        char *str = (char*)malloc(sizeof(char));
         word[level] = '\0'; 
-        sprintf(str, "%s %i\n", word, root->occurrencies);
-        (output == NULL) ? output = "swordx.out" : NULL;
-        FILE *pf = fopen(output, "a");
-        writeFile(pf, str);
+        printInfo(pf, word, root->occurrencies);
     } 
   
     for (i = 0; i < ALPHABET_SIZE; i++){ 
         if (root->children[i]){
             word[level] = root->children[i]->value;
-            _writeTrie(root->children[i], word, output, level + 1); 
+            writeTrie(root->children[i], word, pf, level + 1); 
         } 
-    } 
+    }
 }
 
-void writeFile(FILE *file, char *value){
-    fputs(value, file);
-    fclose(file);
+void printInfo(FILE *pf, char *value, int occ){
+    fprintf(pf, "%s: %i\n", value, occ);
 }
 
 int main(int argc, char **argv) {
@@ -191,6 +186,7 @@ int main(int argc, char **argv) {
     Trie *ignoredWords = createTrie();
     BST **sbo = createBST(); 
     Stack *excludeFiles = initializeNode();
+    FILE *wFile;
 
     while ((c = getopt_long(argc, argv, "hrfeamisolu", long_opts, NULL)) != -1) {
         switch (c) {
@@ -242,6 +238,9 @@ int main(int argc, char **argv) {
         }
     }
 
+    (output == NULL) ? output = "swordx.out" : NULL; // di default il file di output si chiama swordx.out
+    wFile = writeFile(output);
+
     nparams = argc-optind; // number of files and folders
 
     if(argc < 2){
@@ -259,26 +258,31 @@ int main(int argc, char **argv) {
         }
     }
 
+    char *word = (char*) malloc(sizeof(word));
+
     // controllo se c'è SBO attivo
     if(flagIsActive(FLAG_SBO, flags)){
-        sortTrie(sbo, t);
-        printBST(sbo, output);
+        sortTrie(sbo, t, word, 0);
+        printBST(sbo, wFile);
     }else{
-        writeTrie(t, output);
+        writeTrie(t, word, wFile, 0);
     }
-    
+
+    fclose(wFile);
+    free(word);
     free(t);
+    free(ignoredWords);
     free(sbo);
     return 0;
 }
  
-void usage(char *programname){
-    printf("Usage: %s [options] [inputs]\n", programname);
-    printf("Try %s --help for more information.\n", programname);
+void usage(char *programName){
+    printf("Usage: %s [options] [inputs]\n", programName);
+    printf("Try %s --help for more information.\n", programName);
 }
 
-void help(char *programname) {
-    printf("Usage: %s [options] [inputs]\n", programname);
+void help(char *programName) {
+    printf("Usage: %s [options] [inputs]\n", programName);
     printf("swordx count the occurrencies of each words in a file or a range of files and print them into a new file.\n\n");
     printf("\t -h,  --help\t\tshow this message\n");
     printf("\t -r,  --recursive\tcollects words from all subdirectories recursively\n");
