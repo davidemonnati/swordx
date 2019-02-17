@@ -26,8 +26,7 @@ FILE *writeFile(char *output);
 void getIgnoredWords(Trie* ignoreTrie, char *path);
 int isAlphanumeric(char *word);
 int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min, Trie *ignoredWords);
-void sortTrie(BST **b, Trie* root);
-void _sortTrie(BST **b, Trie* root, char *word, int level);
+void sortTrie(BST **b, Trie* root, char *word, int level);
 void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords);
 void printBST(BST **b, FILE *pf);
 void writeTrie(Trie *root, char* word, FILE *pf, int level);
@@ -117,12 +116,7 @@ int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, i
     return 1;
 }
 
-void sortTrie(BST **b, Trie* root){
-    char *word = (char*)malloc(sizeof(char));
-    _sortTrie(b, root, word, 0);
-}
-
-void _sortTrie(BST **b, Trie* root, char *word, int level){
+void sortTrie(BST **b, Trie* root, char *word, int level){
     int i=0;
     if (root->occurrencies>0){ 
         word[level] = '\0';
@@ -132,7 +126,7 @@ void _sortTrie(BST **b, Trie* root, char *word, int level){
     for (i = 0; i < ALPHABET_SIZE; i++){ 
         if (root->children[i]){ 
             word[level] = root->children[i]->value;
-            _sortTrie(b, root->children[i], word, level + 1);
+            sortTrie(b, root->children[i], word, level + 1);
         } 
     }
 }
@@ -244,7 +238,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    (output == NULL) ? output = "swordx.out" : NULL;
+    (output == NULL) ? output = "swordx.out" : NULL; // di default il file di output si chiama swordx.out
     wFile = writeFile(output);
 
     nparams = argc-optind; // number of files and folders
@@ -264,17 +258,20 @@ int main(int argc, char **argv) {
         }
     }
 
+    char *word = (char*) malloc(sizeof(word));
+
     // controllo se c'è SBO attivo
     if(flagIsActive(FLAG_SBO, flags)){
-        sortTrie(sbo, t);
+        sortTrie(sbo, t, word, 0);
         printBST(sbo, wFile);
     }else{
-        char *word = (char*) malloc(sizeof(word));
         writeTrie(t, word, wFile, 0);
     }
 
     fclose(wFile);
+    free(word);
     free(t);
+    free(ignoredWords);
     free(sbo);
     return 0;
 }
