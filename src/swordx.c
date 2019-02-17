@@ -5,6 +5,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <dirent.h>
+#include <time.h>
 
 #include "utils.h"
 #include "trie.h"
@@ -22,12 +23,13 @@ FILE *readFile(char *path);
 FILE *writeFile(char *output);
 void getIgnoredWords(Trie* ignoreTrie, char *path);
 int isAlphanumeric(char *word);
-int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min, Trie *ignoredWords);
+int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min, Trie *ignoredWords, char *logFileName);
 void sortTrie(BST **b, Trie* root, char *word, int level);
-void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords);
+void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords, char *logFileName);
 void printBST(BST **b, FILE *pf);
 void writeTrie(Trie *root, char* word, FILE *pf, int level);
 void printInfo(FILE *pf, char *value, int occ);
+FILE *createCSV(char *path);
 int main(int argc, char **argv);
 void usage(char *programName);
 void help(char *programName);
@@ -88,7 +90,7 @@ int isAlphanumeric(char *word) {
     return 0;
 }
 
-int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min, Trie *ignoredWords){
+int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min, Trie *ignoredWords, char *logFileName){
     DIR *dir;
     dir = opendir(path);
     struct dirent *entry;
@@ -102,9 +104,9 @@ int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, i
     while((entry=readdir(dir)) != NULL){
         sprintf(absolute_path, "%s/%s", path, entry->d_name);
         if(strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..") && !searchStackElement(excludeFiles, absolute_path) ){
-            getWordsToTrie(root, absolute_path, flags, min, ignoredWords);
+            getWordsToTrie(root, absolute_path, flags, min, ignoredWords, logFileName);
             if(isDir(absolute_path) && flagIsActive(FLAG_RECURSIVE, flags))
-                cycleDir(absolute_path, root, flags, excludeFiles, min, ignoredWords);
+                cycleDir(absolute_path, root, flags, excludeFiles, min, ignoredWords, logFileName);
         }
     }
     closedir(dir);
@@ -128,24 +130,37 @@ void sortTrie(BST **b, Trie* root, char *word, int level){
     }
 }
 
-void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords){
+void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords, char *logFileName){
     FILE *rFile = readFile(path);
     char *buffer, *word;
+    int countWords=0, totWords=0, countIgnored=0;
+    double executionTime = 0;
     size_t linesize = 0;
+    clock_t start, end;
 
+    start = clock();
     while (getline(&buffer, &linesize, rFile) > 0){
         word = strtok(buffer, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
         while (word != NULL) { 
-
             if((!flagIsActive(FLAG_ALPHA, flags) || !isAlphanumeric(word))){
-                if(strlen(word) >= min && !searchTrie(ignoredWords, word))
+                if(strlen(word) >= min && !searchTrie(ignoredWords, word)){
+                    countWords++;
                     trieAdd(root, toLowerCase(word));
+                }
             }
-
             word = strtok(NULL, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
         }
     }
     fclose(rFile);
+    totWords = countTrieElements(root);
+
+    end = clock();
+    if(flagIsActive(FLAG_LOG, flags) && isFile(path)){
+        FILE *writecsv = createCSV(logFileName);
+        executionTime = (double)end-start;
+        countIgnored = totWords-countWords;
+        fprintf(writecsv, "%s,%i,%i,%lf\n", path, countWords, countIgnored, executionTime);
+    }
 }
 
 void printBST(BST **b, FILE *pf){
@@ -175,9 +190,23 @@ void printInfo(FILE *pf, char *value, int occ){
     fprintf(pf, "%s: %i\n", value, occ);
 }
 
+FILE *createCSV(char *path){
+    char *fileName = (char*)malloc(sizeof(char));
+    sprintf(fileName, "%s.csv", path);
+    FILE *pf;
+    if((fopen(fileName, "rb")) == NULL){
+        pf = fopen(fileName, "wb");
+        fprintf(pf, "name,cw,iw,time\n");
+        return pf;
+    }
+    pf = fopen(fileName, "a");
+    return pf;
+}
+
 int main(int argc, char **argv) {
     int c, min=0, nparams=0;
     char *output = NULL;
+    char *logFileName = (char*)malloc(sizeof(char));
     unsigned char flags = 0;
     Trie *t = createTrie();
     Trie *ignoredWords = createTrie();
@@ -196,7 +225,7 @@ int main(int argc, char **argv) {
                 break;
 
             case 'f':
-                // do something
+                flags |= FLAG_FOLLOW;
                 break;
                 
             case 'e':
@@ -226,7 +255,8 @@ int main(int argc, char **argv) {
             	break;
 
             case 'l':
-                // do something
+                flags |= FLAG_LOG;
+                logFileName = optarg;
                 break;
 
             case 'u':
@@ -249,9 +279,9 @@ int main(int argc, char **argv) {
     for(int i = 0; i<nparams; i++){
         if(isFile(argv[argc-1])){
             char *path = argv[argc-1];
-            getWordsToTrie(t, path, flags, min, ignoredWords);
+            getWordsToTrie(t, path, flags, min, ignoredWords, logFileName);
         } else if(isDir(argv[argc-1])){
-            cycleDir(argv[argc-1], t, flags, excludeFiles, min, ignoredWords);
+            cycleDir(argv[argc-1], t, flags, excludeFiles, min, ignoredWords, logFileName);
         }
     }
 
@@ -270,6 +300,7 @@ int main(int argc, char **argv) {
     free(t);
     free(ignoredWords);
     free(sbo);
+
     return 0;
 }
  
