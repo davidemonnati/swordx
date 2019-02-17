@@ -19,6 +19,7 @@ void printFlagsValue(unsigned char option);
 unsigned char enableFlag(unsigned char flags, unsigned char option);
 int isFile(char *path);
 int isDir(char *path);
+int isLink(char *path);
 char *toLowerCase(char *word);
 
 #endif

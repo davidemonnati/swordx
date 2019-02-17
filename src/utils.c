@@ -37,6 +37,14 @@ int isDir(char *path){
     return 0;
 }
 
+int isLink(char *path){
+    struct stat statbuf;
+    if(lstat(path, &statbuf)) return 0;
+    if(S_ISLNK(statbuf.st_mode)) return 1;
+
+    return 0;
+}
+
 char *toLowerCase(char *word){
     int i = 0;
     for (i=0; i < strlen(word) + 1; i++) word[i] = tolower(word[i]);
