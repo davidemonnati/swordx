@@ -75,3 +75,16 @@ void _displayTrie(Trie* root, char *word, int level){
         } 
     } 
 }
+
+int countTrieElements(Trie *root){
+    int num = 0;
+    if(root->occurrencies > 0)
+        num++;
+    
+    for (int i = 0; i < ALPHABET_SIZE; i++){ 
+        if (root->children[i])
+            num += countTrieElements(root->children[i]);
+    }
+
+    return num;
+}

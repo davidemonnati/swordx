@@ -19,5 +19,6 @@ Trie *createTrie();
 void trieAdd(Trie *root, char *word);
 int searchTrie(Trie *root, char *key);
 void displayTrie(Trie* root);
+int countTrieElements(Trie *root);
 
 #endif
