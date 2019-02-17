@@ -15,5 +15,6 @@ typedef struct BST {
 BST **createBST();
 void insertSBT(BST **b, char* word, int occurrencies);
 void displayBST(BST **b);
+int countBstElements(BST **b);
 
 #endif

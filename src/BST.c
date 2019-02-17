@@ -29,3 +29,14 @@ void displayBST(BST **b){
         displayBST(&(*b)->right);
     }
 }
+
+int countBstElements(BST **b){
+    int num = 0;
+    if(*b != NULL){
+        num += countBstElements(&(*b)->left);
+        num++;
+        num += countBstElements(&(*b)->right);
+    }
+
+    return num;
+}
