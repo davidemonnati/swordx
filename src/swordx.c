@@ -16,10 +16,7 @@
 #define FLAG_EXCLUDE (1<<2)
 #define FLAG_ALPHA (1<<3)
 #define FLAG_SBO (1<<4)
-// #define FLAG_MIN (1<<4)
-// #define FLAG_IGNORE (1<<5)
-
-// #define FLAG_OUTPUT (1<<7)
+#define FLAG_LOG (1<<5)
 
 FILE *readFile(char *path);
 FILE *writeFile(char *output);
@@ -240,7 +237,7 @@ int main(int argc, char **argv) {
 
     (output == NULL) ? output = "swordx.out" : NULL; // di default il file di output si chiama swordx.out
     wFile = writeFile(output);
-
+    
     nparams = argc-optind; // number of files and folders
 
     if(argc < 2){
