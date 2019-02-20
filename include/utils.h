@@ -21,5 +21,6 @@ int isFile(char *path);
 int isDir(char *path);
 int isLink(char *path);
 char *toLowerCase(char *word);
+void errorman(char *error_desc);
 
 #endif
