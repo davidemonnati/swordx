@@ -166,7 +166,7 @@ void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *
 void printBST(BST **b, FILE *pf){
     if(*b != NULL){
         printBST(&(*b)->left, pf);
-        printInfo(pf, (*b)->word, (*b)->occurrencies);
+        printInfo(pf, (*b)->word, (*b)->occurrences);
         printBST(&(*b)->right, pf);
     }
 }
