@@ -14,7 +14,7 @@ Stack *initializeNode(){
     return head;
 }
 
-void *push(Stack *stack, char *word) {
+void push(Stack *stack, char *word) {
     Stack *newStack = initializeNode();
     newStack->value = (char *) malloc((strlen(word)+1) * sizeof(char));
     strcpy(newStack->value, word);
@@ -22,15 +22,11 @@ void *push(Stack *stack, char *word) {
     *newStack->next = *stack;
     *stack = *newStack;
     free(newStack);
-    return stack;
 }
 
 char *pop(Stack *head){
     char *headValue = head->value;
-    if(head->value == NULL){
-        // perror("SWORDX: Error, stack is empty.");
-        // exit(EXIT_FAILURE);
-    }
+
     Stack *tmp = initializeNode();
     *tmp = *head->next;
     *head = *tmp;
