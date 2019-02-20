@@ -51,3 +51,7 @@ char *toLowerCase(char *word){
     return word;
 }
 
+void errorman(char *error_desc){
+	perror(error_desc);
+	exit(EXIT_FAILURE);
+}

@@ -45,14 +45,18 @@ int searchTrie(Trie *root, char *key){
   
     for (int i=0; i<strlen(key); i++) 
     { 
-        int index = key[i] - 'a' + 10;
+        int index =  getIndex(key[i]);
+        
         if(!tNode->children[index])
             return 0;
   
-        tNode = tNode->children[index]; 
-    } 
+        tNode = tNode->children[index];
+
+        if(tNode->occurrencies > 0) // parola trovata
+            return 1;
+    }
   
-    return 1; 
+    return 0; 
 }
 
 void displayTrie(Trie* root){

@@ -11,7 +11,7 @@
 typedef struct Stack Stack;
 
 Stack *initializeNode();
-void *push(Stack *stack, char *word);
+void push(Stack *stack, char *word);
 char *pop(Stack *head);
 void printStack(Stack *head);
 char *getTopStack(Stack *head);

@@ -26,6 +26,7 @@ int isAlphanumeric(char *word);
 int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min, Trie *ignoredWords, char *logFileName);
 void sortTrie(BST **b, Trie* root, char *word, int level);
 void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords, char *logFileName);
+void logs(char *logFileName, char*filePath, double executionTime, int countWords, int countIgnored);
 void printBST(BST **b, FILE *pf);
 void writeTrie(Trie *root, char* word, FILE *pf, int level);
 void printInfo(FILE *pf, char *value, int occ);
@@ -53,17 +54,16 @@ static struct option const long_opts[] =
 
 FILE *readFile(char *path){
     FILE *pf = fopen(path, "rb");
-    if(pf == NULL){
-        perror("Error reading file");
-    }
+    if(pf == NULL)
+        errorman("Error reading file");
+        
     return pf;
 }
 
 FILE *writeFile(char *output){
     FILE *pf = fopen(output, "wb");
-    if(pf == NULL){
-        perror("Error writing file");
-    }
+    if(pf == NULL)
+        errorman("Error writing file");
     return pf;
 }
 
@@ -72,7 +72,8 @@ void getIgnoredWords(Trie* ignoreTrie, char *path){
     char *buffer, *str;
     size_t linesize = 0;
 
-    if(rFile == NULL) perror("Error opening file");
+    if(rFile == NULL)
+        errorman("Error opening file");
 
     while (getline(&buffer, &linesize, rFile) > 0){
         str = strtok(buffer, " .,:;\n");
@@ -97,7 +98,7 @@ int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, i
     char *absolute_path = (char*)malloc(sizeof(char));
 
     if(!dir){
-        fprintf(stderr, "swordx: %s, %s\n", path, strerror(errno));
+        errorman("Error opening directory");
         exit(EXIT_FAILURE);
     }
 
@@ -133,8 +134,7 @@ void sortTrie(BST **b, Trie* root, char *word, int level){
 void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords, char *logFileName){
     FILE *rFile = readFile(path);
     char *buffer, *word;
-    int countWords=0, totWords=0, countIgnored=0;
-    double executionTime = 0;
+    int countWords=0, totWords=0;
     size_t linesize = 0;
     clock_t start, end;
 
@@ -153,20 +153,22 @@ void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *
     }
     fclose(rFile);
     totWords = countTrieElements(root);
-
     end = clock();
     if(flagIsActive(FLAG_LOG, flags) && isFile(path)){
-        FILE *writecsv = createCSV(logFileName);
-        executionTime = (double)end-start;
-        countIgnored = totWords-countWords;
-        fprintf(writecsv, "%s,%i,%i,%lf\n", path, countWords, countIgnored, executionTime);
+        logs(logFileName, path, (double)end-start, totWords, countWords);
     }
+}
+
+void logs(char *logFileName, char*filePath, double executionTime, int totWords, int countWords){
+    FILE *writecsv = createCSV(logFileName);
+    int countIgnored = totWords-countWords;
+    fprintf(writecsv, "%s,%i,%i,%lf\n", filePath, countWords, countIgnored, executionTime);
 }
 
 void printBST(BST **b, FILE *pf){
     if(*b != NULL){
         printBST(&(*b)->left, pf);
-        printInfo(pf, (*b)->word, (*b)->occurrencies);
+        printInfo(pf, (*b)->word, (*b)->occurrences);
         printBST(&(*b)->right, pf);
     }
 }
@@ -271,8 +273,8 @@ int main(int argc, char **argv) {
     nparams = argc-optind; // number of files and folders
 
     if(argc < 2){
-        fprintf(stderr, "swordx: no input files or directory\n");
         usage(argv[0]);
+        errorman("swordx: no input files or directory");
         exit(EXIT_FAILURE);
     }
     

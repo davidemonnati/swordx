@@ -7,7 +7,7 @@
 
 typedef struct BST {
     char *word;
-    int occurrencies;
+    int occurrences;
     struct BST *left;
     struct BST *right;
 } BST;
