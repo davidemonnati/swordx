@@ -53,17 +53,15 @@ static struct option const long_opts[] =
 
 FILE *readFile(char *path){
     FILE *pf = fopen(path, "rb");
-    if(pf == NULL){
-        perror("Error reading file");
-    }
+    if(pf == NULL)
+        errorman("Error reading file");
     return pf;
 }
 
 FILE *writeFile(char *output){
     FILE *pf = fopen(output, "wb");
-    if(pf == NULL){
-        perror("Error writing file");
-    }
+    if(pf == NULL)
+        errorman("Error writing file");
     return pf;
 }
 
@@ -72,7 +70,8 @@ void getIgnoredWords(Trie* ignoreTrie, char *path){
     char *buffer, *str;
     size_t linesize = 0;
 
-    if(rFile == NULL) perror("Error opening file");
+    if(rFile == NULL)
+        errorman("Error opening file");
 
     while (getline(&buffer, &linesize, rFile) > 0){
         str = strtok(buffer, " .,:;\n");
@@ -97,7 +96,7 @@ int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, i
     char *absolute_path = (char*)malloc(sizeof(char));
 
     if(!dir){
-        fprintf(stderr, "swordx: %s, %s\n", path, strerror(errno));
+        errorman("Error opening directory");
         exit(EXIT_FAILURE);
     }
 
@@ -271,8 +270,8 @@ int main(int argc, char **argv) {
     nparams = argc-optind; // number of files and folders
 
     if(argc < 2){
-        fprintf(stderr, "swordx: no input files or directory\n");
         usage(argv[0]);
+        errorman("swordx: no input files or directory");
         exit(EXIT_FAILURE);
     }
     
