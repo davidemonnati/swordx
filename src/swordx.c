@@ -18,15 +18,17 @@
 #define FLAG_ALPHA (1<<3)
 #define FLAG_SBO (1<<4)
 #define FLAG_LOG (1<<5)
+#define FLAG_UPDATE (1<<6)
 
 FILE *readFile(char *path);
 FILE *writeFile(char *output);
-void getIgnoredWords(Trie* ignoreTrie, char *path);
+FILE *appendFile(char *path);
+void getIgnoredWords(Trie* ignoreTrie, char *path, unsigned char flags);
 int isAlphanumeric(char *word);
 int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min, Trie *ignoredWords, char *logFileName);
 void sortTrie(BST **b, Trie* root, char *word, int level);
 void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords, char *logFileName);
-void logs(char *logFileName, char*filePath, double executionTime, int countWords, int countIgnored);
+void logs(char *logFileName, char*filePath, double executionTime, int countIgnored, int countWords);
 void printBST(BST **b, FILE *pf);
 void writeTrie(Trie *root, char* word, FILE *pf, int level);
 void printInfo(FILE *pf, char *value, int occ);
@@ -37,19 +39,19 @@ void help(char *programName);
 
 static struct option const long_opts[] =
         {
-                {"help",             no_argument,       NULL, 'h'}, // OK
-                {"recursive",        no_argument,       NULL, 'r'}, // OK
-                {"follow",           no_argument,       NULL, 'f'}, // link
-                {"exclude",          required_argument, NULL, 'e'}, // OK
-                {"alpha",            no_argument,       NULL, 'a'}, // OK
-                {"min",              required_argument, NULL, 'm'}, // OK
-                {"ignore",           required_argument, NULL, 'i'}, // OK
-                {"sortbyoccurrency", no_argument,       NULL, 's'}, // OK
-                {"sbo",              no_argument,       NULL, 's'}, // OK
-                {"output",           required_argument, NULL, 'o'}, // OK
+                {"help",             no_argument,       NULL, 'h'},
+                {"recursive",        no_argument,       NULL, 'r'},
+                {"follow",           no_argument,       NULL, 'f'},
+                {"exclude",          required_argument, NULL, 'e'},
+                {"alpha",            no_argument,       NULL, 'a'},
+                {"min",              required_argument, NULL, 'm'},
+                {"ignore",           required_argument, NULL, 'i'},
+                {"sortbyoccurrency", no_argument,       NULL, 's'},
+                {"sbo",              no_argument,       NULL, 's'},
+                {"output",           required_argument, NULL, 'o'},
                 {"log",              required_argument, NULL, 'l'},
                 {"update",           required_argument, NULL, 'u'},
-                {NULL, 0,                               NULL, 0} // required
+                {NULL, 0,                               NULL, 0}
         };
 
 FILE *readFile(char *path){
@@ -67,8 +69,21 @@ FILE *writeFile(char *output){
     return pf;
 }
 
-void getIgnoredWords(Trie* ignoreTrie, char *path){
-    FILE *rFile = readFile(path);
+FILE *appendFile(char *path){
+    FILE *pf = fopen(path, "a+");
+    if(pf == NULL)
+        errorman("Error opening file");
+    
+    return pf;
+}
+
+void getIgnoredWords(Trie* ignoreTrie, char *path, unsigned char flags){
+    FILE *rFile;
+    if(flagIsActive(FLAG_UPDATE,flags))
+        rFile = appendFile(path);
+    else
+        rFile = readFile(path);
+    
     char *buffer, *str;
     size_t linesize = 0;
 
@@ -76,12 +91,20 @@ void getIgnoredWords(Trie* ignoreTrie, char *path){
         errorman("Error opening file");
 
     while (getline(&buffer, &linesize, rFile) > 0){
+        /* Elimino le occorrenze nel file di input
+         * che carico per eseguire l'update */
+        if(flagIsActive(FLAG_UPDATE,flags)) 
+            str = strtok(buffer, " .,:;\n");
+
         str = strtok(buffer, " .,:;\n");
         while(str != NULL){
             trieAdd(ignoreTrie, str);
             str = strtok(NULL, " .,:;\n");
         } 
     }
+    if(flagIsActive(FLAG_UPDATE,flags))
+        fprintf(rFile, "\n====== UPDATE ======\n");
+    fclose(rFile);
 }
 
 int isAlphanumeric(char *word) {
@@ -133,14 +156,15 @@ void sortTrie(BST **b, Trie* root, char *word, int level){
 
 void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords, char *logFileName){
     FILE *rFile = readFile(path);
+    
     char *buffer, *word;
-    int countWords=0, totWords=0;
+    int countWords=0, countIgnored=0;
     size_t linesize = 0;
     clock_t start, end;
 
     start = clock();
     while (getline(&buffer, &linesize, rFile) > 0){
-        word = strtok(buffer, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
+        word = strtok(buffer, " ,.:;+-_[]()/!£$%&?^|*€@#=§°*'\n");
         while (word != NULL) { 
             if((!flagIsActive(FLAG_ALPHA, flags) || !isAlphanumeric(word))){
                 if(strlen(word) >= min && !searchTrie(ignoredWords, word)){
@@ -148,21 +172,21 @@ void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *
                     trieAdd(root, toLowerCase(word));
                 }
             }
-            word = strtok(NULL, " ,.:;-_[]()/!£$%&?^|*€@#§°*'\n");
+            word = strtok(NULL, " ,.:;+-_[]()/!£$%&?^|*€@#=§°*'\n");
         }
     }
     fclose(rFile);
-    totWords = countTrieElements(root);
+    countIgnored = countTrieElements(ignoredWords);
     end = clock();
     if(flagIsActive(FLAG_LOG, flags) && isFile(path)){
-        logs(logFileName, path, (double)end-start, totWords, countWords);
+        logs(logFileName, path, (double)end-start, countIgnored, countWords);
     }
 }
 
-void logs(char *logFileName, char*filePath, double executionTime, int totWords, int countWords){
+void logs(char *logFileName, char*filePath, double executionTime, int countIgnored, int countWords){
     FILE *writecsv = createCSV(logFileName);
-    int countIgnored = totWords-countWords;
-    fprintf(writecsv, "%s,%i,%i,%lf\n", filePath, countWords, countIgnored, executionTime);
+    fprintf(writecsv, "%s,%i,%i,%f\n", filePath, countWords, countIgnored, executionTime);
+    fclose(writecsv);
 }
 
 void printBST(BST **b, FILE *pf){
@@ -244,7 +268,7 @@ int main(int argc, char **argv) {
                 break;
 
             case 'i':
-                getIgnoredWords(ignoredWords, optarg);
+                getIgnoredWords(ignoredWords, optarg, flags);
                 break;
 
             case 's':
@@ -262,13 +286,19 @@ int main(int argc, char **argv) {
                 break;
 
             case 'u':
-                // do something
+                flags |= FLAG_UPDATE;
+                getIgnoredWords(ignoredWords, optarg, flags);
                 break;
         }
     }
 
     (output == NULL) ? output = "swordx.out" : NULL; // di default il file di output si chiama swordx.out
-    wFile = writeFile(output);
+
+    if(flagIsActive(FLAG_UPDATE, flags))
+        wFile = appendFile(output);
+    else
+        wFile = writeFile(output);
+    
     
     nparams = argc-optind; // number of files and folders
 
