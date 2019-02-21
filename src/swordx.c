@@ -26,11 +26,13 @@ FILE *appendFile(char *path);
 void getIgnoredWords(Trie* ignoreTrie, char *path, unsigned char flags);
 int isAlphanumeric(char *word);
 int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, int min, Trie *ignoredWords, char *logFileName);
-void sortTrie(BST **b, Trie* root, char *word, int level);
+void sortTrie(BST **b, Trie* root);
+void _sortTrie(BST **b, Trie* root, char *word, int level);
 void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *ignoredWords, char *logFileName);
 void logs(char *logFileName, char*filePath, double executionTime, int countIgnored, int countWords);
 void printBST(BST **b, FILE *pf);
-void writeTrie(Trie *root, char* word, FILE *pf, int level);
+void writeTrie(Trie *root, FILE *pf);
+void _writeTrie(Trie *root, char* word, FILE *pf, int level);
 void printInfo(FILE *pf, char *value, int occ);
 FILE *createCSV(char *path);
 int main(int argc, char **argv);
@@ -139,7 +141,13 @@ int cycleDir(char *path, Trie *root, unsigned char flags, Stack *excludeFiles, i
     return 1;
 }
 
-void sortTrie(BST **b, Trie* root, char *word, int level){
+void sortTrie(BST **b, Trie* root){
+    char *word = (char*) malloc(sizeof(word));
+    _sortTrie(b,root, word, 0);
+    free(word);
+}
+
+void _sortTrie(BST **b, Trie* root, char *word, int level){
     int i=0;
     if (root->occurrencies>0){ 
         word[level] = '\0';
@@ -149,7 +157,7 @@ void sortTrie(BST **b, Trie* root, char *word, int level){
     for (i = 0; i < ALPHABET_SIZE; i++){ 
         if (root->children[i]){ 
             word[level] = root->children[i]->value;
-            sortTrie(b, root->children[i], word, level + 1);
+            _sortTrie(b, root->children[i], word, level + 1);
         } 
     }
 }
@@ -197,7 +205,13 @@ void printBST(BST **b, FILE *pf){
     }
 }
 
-void writeTrie(Trie *root, char* word, FILE *pf, int level){
+void writeTrie(Trie *root, FILE *pf){
+    char *word = (char*) malloc(sizeof(word));
+    _writeTrie(root, word, pf, 0);
+    free(word);
+}
+
+void _writeTrie(Trie *root, char* word, FILE *pf, int level){
     int i=0;
     if (root->occurrencies>0){
         word[level] = '\0'; 
@@ -207,7 +221,7 @@ void writeTrie(Trie *root, char* word, FILE *pf, int level){
     for (i = 0; i < ALPHABET_SIZE; i++){ 
         if (root->children[i]){
             word[level] = root->children[i]->value;
-            writeTrie(root->children[i], word, pf, level + 1); 
+            _writeTrie(root->children[i], word, pf, level + 1); 
         } 
     }
 }
@@ -317,18 +331,15 @@ int main(int argc, char **argv) {
         }
     }
 
-    char *word = (char*) malloc(sizeof(word));
-
     // controllo se c'è SBO attivo
     if(flagIsActive(FLAG_SBO, flags)){
-        sortTrie(sbo, t, word, 0);
+        sortTrie(sbo, t);
         printBST(sbo, wFile);
     }else{
-        writeTrie(t, word, wFile, 0);
+        writeTrie(t, wFile);
     }
 
     fclose(wFile);
-    free(word);
     free(t);
     free(ignoredWords);
     free(sbo);

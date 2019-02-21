@@ -10,15 +10,6 @@ int flagIsActive(unsigned char option, unsigned char flags){
     return 0;
 }
 
-void printFlagsValue(unsigned char option){
-    printf("%u\n", option);
-}
-
-unsigned char enableFlag(unsigned char flags, unsigned char option){
-    flags |= option;
-    return flags;
-}
-
 /* Dir and file management functions */
 
 int isFile(char *path){
