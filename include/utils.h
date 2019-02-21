@@ -3,13 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <getopt.h>
-#include <memory.h>
-#include <malloc.h>
-#include <errno.h>
-#include <dirent.h>
 #include <sys/stat.h>
-#include <string.h>
 #include <ctype.h>
 
 #include "stack.h"
