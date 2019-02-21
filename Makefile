@@ -1,6 +1,6 @@
 CC=gcc
 
-VPATH = src include
+# VPATH = src include
 HEADERDIR = include
 
 vpath %.c src
