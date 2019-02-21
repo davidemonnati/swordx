@@ -1,6 +1,4 @@
 CC=gcc
-
-VPATH = src include
 HEADERDIR = include
 
 vpath %.c src

@@ -12,10 +12,10 @@ void insertSBT(BST **b, char* word, int occurrencies){
         strcpy(tmp, word);
         (*b) = (BST*)malloc(sizeof(BST));
         (*b)->word = tmp;
-        (*b)->occurrencies = occurrencies;
+        (*b)->occurrences = occurrencies;
         (*b)->left = NULL;
         (*b)->right = NULL;
-    }else if (occurrencies < (*b)->occurrencies){
+    }else if (occurrencies < (*b)->occurrences){
         insertSBT(&(*b)->left, word, occurrencies);
     }else{
         insertSBT(&(*b)->right, word, occurrencies);
@@ -25,7 +25,18 @@ void insertSBT(BST **b, char* word, int occurrencies){
 void displayBST(BST **b){
     if(*b != NULL){
         displayBST(&(*b)->left);
-        printf("%s %i\n", (*b)->word, (*b)->occurrencies);
+        printf("%s %i\n", (*b)->word, (*b)->occurrences);
         displayBST(&(*b)->right);
     }
+}
+
+int countBstElements(BST **b){
+    int num = 0;
+    if(*b != NULL){
+        num += countBstElements(&(*b)->left);
+        num++;
+        num += countBstElements(&(*b)->right);
+    }
+
+    return num;
 }
