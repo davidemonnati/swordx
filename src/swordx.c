@@ -172,7 +172,7 @@ void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *
 
     start = clock();
     while (getline(&buffer, &linesize, rFile) > 0){
-        word = strtok(buffer, " ,.:;+-_[]()/!£$%&?^|*€@#=§°*'\n");
+        word = strtok(buffer, " ,.:;+-_[]()/!£$%&?^|*€@#=§°*<>'\n");
         while (word != NULL) { 
             if((!flagIsActive(FLAG_ALPHA, flags) || !isAlphanumeric(word))){
                 if(strlen(word) >= min && !searchTrie(ignoredWords, word)){
@@ -180,7 +180,7 @@ void getWordsToTrie(Trie *root, char *path, unsigned char flags, int min, Trie *
                     trieAdd(root, toLowerCase(word));
                 }
             }
-            word = strtok(NULL, " ,.:;+-_[]()/!£$%&?^|*€@#=§°*'\n");
+            word = strtok(NULL, " ,.:;+-_[]()/!£$%&?^|*€@#=§°*<>'\n");
         }
     }
     fclose(rFile);
@@ -249,7 +249,7 @@ int main(int argc, char **argv) {
     char *logFileName = (char*)malloc(sizeof(char));
     unsigned char flags = 0;
     Trie *t = createTrie();
-    Trie *ignoredWords = createTrie();
+    Trie *ignoredWords = NULL;
     BST **sbo = createBST(); 
     Stack *excludeFiles = initializeNode();
     FILE *wFile;
@@ -282,6 +282,7 @@ int main(int argc, char **argv) {
                 break;
 
             case 'i':
+                ignoredWords = createTrie();
                 getIgnoredWords(ignoredWords, optarg, flags);
                 break;
 
@@ -300,6 +301,7 @@ int main(int argc, char **argv) {
                 break;
 
             case 'u':
+                ignoredWords = createTrie();
                 flags |= FLAG_UPDATE;
                 getIgnoredWords(ignoredWords, optarg, flags);
                 break;
