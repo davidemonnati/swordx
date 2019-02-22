@@ -41,10 +41,12 @@ void trieAdd(Trie *root, char *word){
 }
 
 int searchTrie(Trie *root, char *key){
+    if(root == NULL)
+        return 0;
+    
     Trie *tNode = root;
   
-    for (int i=0; i<strlen(key); i++) 
-    { 
+    for(int i=0; i<strlen(key); i++){
         int index =  getIndex(key[i]);
         
         if(!tNode->children[index])
@@ -82,6 +84,7 @@ void _displayTrie(Trie* root, char *word, int level){
 
 int countTrieElements(Trie *root){
     int num = 0;
+    if(root == NULL) return 0;
     if(root->occurrencies > 0)
         num++;
     
