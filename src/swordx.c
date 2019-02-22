@@ -301,6 +301,7 @@ int main(int argc, char **argv) {
                 break;
 
             case 'u':
+                ignoredWords = createTrie();
                 flags |= FLAG_UPDATE;
                 getIgnoredWords(ignoredWords, optarg, flags);
                 break;
